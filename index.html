@@ -368,11 +368,27 @@
             display: none !important;
         }
 
+        /* Numeric Input Optimization for Mobile */
+        input[inputmode="numeric"] {
+            text-align: right;
+            /* Align numbers to the right for better UX */
+            font-variant-numeric: tabular-nums;
+            /* Use monospace numbers */
+        }
+
         /* Better Mobile Touch Targets */
         @media (max-width: 768px) {
             .touch-target {
                 min-height: 44px;
                 min-width: 44px;
+            }
+
+            /* Enhanced numeric input for mobile */
+            input[inputmode="numeric"] {
+                font-size: 18px !important;
+                /* Larger font for better readability */
+                letter-spacing: 0.5px;
+                /* Better spacing for numbers */
             }
 
             .toast-container {
@@ -1063,10 +1079,12 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <input type="text" id="min-amount" placeholder="Từ (VD: 100.000)"
+                                            inputmode="numeric" pattern="[0-9]*"
                                             class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm">
                                     </div>
                                     <div>
                                         <input type="text" id="max-amount" placeholder="Đến (VD: 1.000.000)"
+                                            inputmode="numeric" pattern="[0-9]*"
                                             class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm">
                                     </div>
                                 </div>
@@ -1241,7 +1259,8 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <input type="text" id="amount" placeholder="Số tiền (VD: 100.000)"
+                            <input type="text" id="amount" placeholder="Số tiền (VD: 100.000)" inputmode="numeric"
+                                pattern="[0-9]*"
                                 class="p-3 bg-gray-700 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 touch-target w-full">
                             <div id="amount-error" class="error-message">Số tiền phải từ 1₫ trở lên</div>
                         </div>
