@@ -17,8 +17,7 @@
         }
 
         main {
-            padding-bottom: 100px;
-            /* Increased padding to prevent overlap */
+            margin-bottom: 80px;
         }
 
         ::-webkit-scrollbar {
@@ -80,6 +79,14 @@
         .type-toggle-btn.income.active {
             background-color: #22c55e;
         }
+
+        .progress-bar {
+            background-color: #4b5563;
+        }
+
+        .progress-bar-inner {
+            transition: width 0.5s ease-in-out;
+        }
     </style>
 </head>
 
@@ -120,15 +127,12 @@
                 <form id="transaction-form" class="space-y-4 p-4 bg-gray-700 rounded-xl shadow">
                     <h3 id="form-title" class="text-lg font-semibold text-center">Thêm giao dịch mới</h3>
                     <input type="hidden" id="editing-id">
-
-                    <!-- Add Mode Toggle -->
                     <div id="add-mode-toggle" class="grid grid-cols-2 gap-2 p-1 bg-gray-600 rounded-lg">
                         <button type="button" data-type="expense"
                             class="type-toggle-btn expense p-2 rounded-md text-sm transition">Chi tiêu</button>
                         <button type="button" data-type="income"
                             class="type-toggle-btn income p-2 rounded-md text-sm transition">Thu nhập</button>
                     </div>
-
                     <input type="text" id="description" placeholder="Mô tả"
                         class="w-full p-3 bg-gray-600 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                         required>
@@ -147,6 +151,14 @@
                         </button>
                     </div>
                 </form>
+                <div class="mt-6 p-4 bg-gray-600 rounded-lg text-sm">
+                    <h4 class="font-bold mb-2"><i class="fas fa-info-circle mr-2"></i>Hướng dẫn</h4>
+                    <ul class="list-disc list-inside space-y-1 text-gray-300">
+                        <li>Sử dụng nút gạt <strong>"Chi tiêu" / "Thu nhập"</strong> để chọn loại giao dịch.</li>
+                        <li>Điền đầy đủ các thông tin và nhấn nút <strong>"Thêm Giao Dịch"</strong>.</li>
+                        <li>Khi sửa một giao dịch, loại giao dịch (thu/chi) sẽ được giữ nguyên.</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Reports View -->
@@ -196,10 +208,23 @@
                 </section>
                 <section>
                     <div id="full-transaction-list" class="bg-gray-700 rounded-xl shadow overflow-hidden">
-                        <div id="empty-state" class="text-center p-8 text-gray-400 hidden">
-                            <i class="fas fa-receipt fa-3x mb-4"></i>
+                        <div id="empty-state" class="text-center p-8 text-gray-400 hidden"><i
+                                class="fas fa-receipt fa-3x mb-4"></i>
                             <p>Không có giao dịch nào.</p>
                         </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Budget View -->
+            <div id="budget-view" class="view hidden">
+                <section class="p-4 bg-gray-700 rounded-xl shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Ngân sách tháng này</h3>
+                        <p id="budget-month" class="text-sm text-gray-400"></p>
+                    </div>
+                    <div id="budget-list" class="space-y-4">
+                        <!-- Budget items will be injected here -->
                     </div>
                 </section>
             </div>
@@ -219,9 +244,8 @@
                 <section class="p-4 bg-gray-700 rounded-xl shadow">
                     <h3 class="text-lg font-semibold mb-3">Quản lý dữ liệu</h3>
                     <button id="export-csv"
-                        class="w-full p-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition">
-                        <i class="fas fa-file-csv mr-2"></i> Xuất ra file CSV
-                    </button>
+                        class="w-full p-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition"><i
+                            class="fas fa-file-csv mr-2"></i> Xuất ra file CSV</button>
                 </section>
             </div>
         </main>
@@ -234,6 +258,8 @@
                     class="fas fa-plus-circle text-xl"></i><span class="text-xs block mt-1">Thêm mới</span></button>
             <button data-tab="reports" class="tab-btn flex-1 p-3 text-center text-gray-400"><i
                     class="fas fa-chart-pie text-xl"></i><span class="text-xs block mt-1">Báo cáo</span></button>
+            <button data-tab="budget" class="tab-btn flex-1 p-3 text-center text-gray-400"><i
+                    class="fas fa-piggy-bank text-xl"></i><span class="text-xs block mt-1">Ngân sách</span></button>
             <button data-tab="settings" class="tab-btn flex-1 p-3 text-center text-gray-400"><i
                     class="fas fa-cog text-xl"></i><span class="text-xs block mt-1">Cài đặt</span></button>
         </nav>
@@ -244,39 +270,35 @@
         <div class="bg-gray-800 rounded-lg p-6 w-11/12 max-w-sm text-center shadow-xl">
             <h3 class="text-lg font-bold mb-4">Xác nhận xóa</h3>
             <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa giao dịch này không?</p>
-            <div class="flex justify-center space-x-4">
-                <button id="cancelDelete" class="px-6 py-2 bg-gray-600 rounded-lg">Hủy</button>
-                <button id="confirmDelete" class="px-6 py-2 bg-red-500 text-white rounded-lg">Xóa</button>
-            </div>
+            <div class="flex justify-center space-x-4"><button id="cancelDelete"
+                    class="px-6 py-2 bg-gray-600 rounded-lg">Hủy</button><button id="confirmDelete"
+                    class="px-6 py-2 bg-red-500 text-white rounded-lg">Xóa</button></div>
         </div>
     </div>
-
     <div id="editCategoryModal"
         class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
         <div class="bg-gray-800 rounded-lg p-6 w-11/12 max-w-sm shadow-xl">
             <h3 class="text-lg font-bold mb-4 text-center">Sửa tên danh mục</h3>
-            <form id="edit-category-form">
-                <input type="hidden" id="old-category-name">
-                <input type="text" id="edit-category-name"
-                    class="w-full p-2 bg-gray-600 border border-gray-500 rounded-lg" required>
-                <div class="flex justify-end space-x-4 mt-6">
-                    <button type="button" id="cancelEditCategory" class="px-6 py-2 bg-gray-600 rounded-lg">Hủy</button>
-                    <button type="submit" class="px-6 py-2 bg-indigo-500 text-white rounded-lg">Lưu</button>
-                </div>
+            <form id="edit-category-form"><input type="hidden" id="old-category-name"><input type="text"
+                    id="edit-category-name" class="w-full p-2 bg-gray-600 border border-gray-500 rounded-lg" required>
+                <div class="flex justify-end space-x-4 mt-6"><button type="button" id="cancelEditCategory"
+                        class="px-6 py-2 bg-gray-600 rounded-lg">Hủy</button><button type="submit"
+                        class="px-6 py-2 bg-indigo-500 text-white rounded-lg">Lưu</button></div>
             </form>
         </div>
     </div>
-
 
     <script type="module">
         // --- GLOBAL STATE & VARIABLES ---
         const TRANSACTIONS_KEY = 'expenseTrackerTransactions_v2';
         const CATEGORIES_KEY = 'expenseTrackerCategories_v2';
+        const BUDGETS_KEY = 'expenseTrackerBudgets_v2';
         let transactionToDeleteId = null;
         let expenseChart = null;
         let allTransactions = [];
         let allCategories = [];
-        let currentTransactionType = 'expense'; // Default type for new transactions
+        let allBudgets = {};
+        let currentTransactionType = 'expense';
 
         // --- DOM ELEMENTS ---
         const loadingEl = document.getElementById('loading');
@@ -286,6 +308,7 @@
             home: document.getElementById('home-view'),
             'add-edit': document.getElementById('add-edit-view'),
             reports: document.getElementById('reports-view'),
+            budget: document.getElementById('budget-view'),
             settings: document.getElementById('settings-view'),
         };
         const balanceEl = document.getElementById('balance');
@@ -310,6 +333,8 @@
         const reportIncomeEl = document.getElementById('report-income');
         const reportExpenseEl = document.getElementById('report-expense');
         const reportNetEl = document.getElementById('report-net');
+        const budgetListEl = document.getElementById('budget-list');
+        const budgetMonthEl = document.getElementById('budget-month');
         const categoryListEl = document.getElementById('category-list');
         const addCategoryForm = document.getElementById('add-category-form');
         const newCategoryNameInput = document.getElementById('new-category-name');
@@ -326,12 +351,13 @@
 
         // --- DATA MANAGEMENT (localStorage) ---
         const Storage = {
-            get: (key) => JSON.parse(localStorage.getItem(key) || '[]'),
+            get: (key, defaultValue = '[]') => JSON.parse(localStorage.getItem(key) || defaultValue),
             set: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
         };
 
         function loadData() {
             allTransactions = Storage.get(TRANSACTIONS_KEY).map(t => ({ ...t, createdAt: new Date(t.createdAt) }));
+            allBudgets = Storage.get(BUDGETS_KEY, '{}');
             allCategories = Storage.get(CATEGORIES_KEY);
             if (allCategories.length === 0) {
                 allCategories = ["Ăn uống", "Di chuyển", "Giải trí", "Mua sắm", "Hóa đơn", "Sức khỏe", "Thu nhập", "Khác"];
@@ -348,16 +374,15 @@
             const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
             if (activeBtn) activeBtn.classList.add('active');
 
-            const titles = { home: 'Trang chủ', 'add-edit': 'Thêm/Sửa Giao dịch', reports: 'Báo cáo', settings: 'Cài đặt' };
+            const titles = { home: 'Trang chủ', 'add-edit': 'Thêm/Sửa Giao dịch', reports: 'Báo cáo', budget: 'Ngân sách', settings: 'Cài đặt' };
             headerTitleEl.textContent = titles[tabName] || 'Trang chủ';
         };
 
         tabNav.addEventListener('click', (e) => {
             const tabButton = e.target.closest('.tab-btn');
             if (tabButton) {
-                if (tabButton.dataset.tab === 'add-edit') {
-                    setupFormForAdd();
-                }
+                if (tabButton.dataset.tab === 'add-edit') setupFormForAdd();
+                if (tabButton.dataset.tab === 'budget') renderBudgetView();
                 switchTab(tabButton.dataset.tab);
             }
         });
@@ -368,13 +393,7 @@
             allCategories.forEach(cat => {
                 const li = document.createElement('li');
                 li.className = 'flex justify-between items-center p-2 bg-gray-600 rounded';
-                li.innerHTML = `
-                    <span>${cat}</span>
-                    <div class="space-x-3">
-                        <button data-category="${cat}" class="edit-category-btn text-indigo-400 hover:text-indigo-300"><i class="fas fa-edit"></i></button>
-                        <button data-category="${cat}" class="delete-category-btn text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
+                li.innerHTML = `<span>${cat}</span><div class="space-x-3"><button data-category="${cat}" class="edit-category-btn text-indigo-400 hover:text-indigo-300"><i class="fas fa-edit"></i></button><button data-category="${cat}" class="delete-category-btn text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button></div>`;
                 categoryListEl.appendChild(li);
             });
             populateCategoryDropdown();
@@ -383,9 +402,7 @@
         function populateCategoryDropdown() {
             const currentCategory = categoryInput.value;
             categoryInput.innerHTML = allCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-            if (allCategories.includes(currentCategory)) {
-                categoryInput.value = currentCategory;
-            }
+            if (allCategories.includes(currentCategory)) categoryInput.value = currentCategory;
         }
 
         addCategoryForm.addEventListener('submit', (e) => {
@@ -404,13 +421,13 @@
             if (deleteBtn) {
                 const catToDelete = deleteBtn.dataset.category;
                 allCategories = allCategories.filter(c => c !== catToDelete);
+                delete allBudgets[catToDelete]; // Also remove from budget
                 Storage.set(CATEGORIES_KEY, allCategories);
+                Storage.set(BUDGETS_KEY, allBudgets);
                 renderCategories();
             }
             const editBtn = e.target.closest('.edit-category-btn');
-            if (editBtn) {
-                showEditCategoryModal(editBtn.dataset.category);
-            }
+            if (editBtn) showEditCategoryModal(editBtn.dataset.category);
         });
 
         function showEditCategoryModal(oldName) {
@@ -420,52 +437,95 @@
             editCategoryNameInput.focus();
         }
 
-        function closeEditCategoryModal() {
-            editCategoryModal.classList.add('hidden');
-        }
+        function closeEditCategoryModal() { editCategoryModal.classList.add('hidden'); }
 
         editCategoryForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const oldName = oldCategoryNameInput.value;
             const newName = editCategoryNameInput.value.trim();
-
-            if (!newName || newName === oldName) {
-                closeEditCategoryModal();
-                return;
-            }
-
-            if (allCategories.find(c => c.toLowerCase() === newName.toLowerCase())) {
-                alert('Tên danh mục đã tồn tại.');
-                return;
-            }
+            if (!newName || newName === oldName) { closeEditCategoryModal(); return; }
+            if (allCategories.find(c => c.toLowerCase() === newName.toLowerCase())) { alert('Tên danh mục đã tồn tại.'); return; }
 
             const categoryIndex = allCategories.findIndex(c => c === oldName);
-            if (categoryIndex > -1) {
-                allCategories[categoryIndex] = newName;
-            }
+            if (categoryIndex > -1) allCategories[categoryIndex] = newName;
 
-            allTransactions.forEach(t => {
-                if (t.category === oldName) {
-                    t.category = newName;
-                }
-            });
+            allTransactions.forEach(t => { if (t.category === oldName) t.category = newName; });
+
+            if (allBudgets[oldName]) {
+                allBudgets[newName] = allBudgets[oldName];
+                delete allBudgets[oldName];
+            }
 
             Storage.set(CATEGORIES_KEY, allCategories);
             Storage.set(TRANSACTIONS_KEY, allTransactions);
+            Storage.set(BUDGETS_KEY, allBudgets);
             renderCategories();
             processAndRenderData();
             closeEditCategoryModal();
         });
         cancelEditCategoryBtn.addEventListener('click', closeEditCategoryModal);
 
+        // --- BUDGET MANAGEMENT ---
+        function renderBudgetView() {
+            const now = new Date();
+            budgetMonthEl.textContent = `Tháng ${now.getMonth() + 1}/${now.getFullYear()}`;
+            budgetListEl.innerHTML = '';
+
+            const transactionsThisMonth = allTransactions.filter(t => {
+                const tDate = t.createdAt;
+                return tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+            });
+
+            const expenseCategories = allCategories.filter(c => c !== 'Thu nhập');
+
+            expenseCategories.forEach(cat => {
+                const spent = transactionsThisMonth
+                    .filter(t => t.type === 'expense' && t.category === cat)
+                    .reduce((sum, t) => sum + t.amount, 0);
+
+                const budget = allBudgets[cat] || 0;
+                const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+
+                let progressBarColor = 'bg-green-500';
+                if (percentage > 90) progressBarColor = 'bg-red-500';
+                else if (percentage > 70) progressBarColor = 'bg-yellow-500';
+
+                const item = document.createElement('div');
+                item.innerHTML = `
+                    <div class="flex justify-between items-center mb-1 text-sm">
+                        <span class="font-semibold">${cat}</span>
+                        <span class="text-gray-400">${new Intl.NumberFormat('vi-VN').format(spent)} / ${new Intl.NumberFormat('vi-VN').format(budget)} ₫</span>
+                    </div>
+                    <div class="progress-bar w-full rounded-full h-2.5">
+                        <div class="progress-bar-inner ${progressBarColor} h-2.5 rounded-full" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="mt-2">
+                        <input type="number" data-category="${cat}" value="${budget > 0 ? budget : ''}" placeholder="Đặt ngân sách..." class="budget-input w-full p-2 bg-gray-600 border border-gray-500 rounded-lg text-sm">
+                    </div>
+                `;
+                budgetListEl.appendChild(item);
+            });
+        }
+
+        budgetListEl.addEventListener('change', (e) => {
+            if (e.target.classList.contains('budget-input')) {
+                const category = e.target.dataset.category;
+                const amount = parseInt(e.target.value, 10) || 0;
+                if (amount > 0) {
+                    allBudgets[category] = amount;
+                } else {
+                    delete allBudgets[category];
+                }
+                Storage.set(BUDGETS_KEY, allBudgets);
+                renderBudgetView(); // Re-render to update the view
+            }
+        });
 
         // --- DATA PROCESSING & RENDERING ---
         function getFilteredTransactions() {
             allTransactions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
             const searchTerm = searchInput.value.toLowerCase();
             const { startDate, endDate } = getDateRangeFromFilter();
-
             return allTransactions.filter(t => {
                 const tDate = t.createdAt;
                 const matchesSearch = t.description.toLowerCase().includes(searchTerm);
@@ -476,18 +536,17 @@
 
         function processAndRenderData() {
             const filteredTransactions = getFilteredTransactions();
-
             renderTransactionList(filteredTransactions, fullTransactionListEl, emptyStateEl);
             renderTransactionList(allTransactions.slice(0, 5), recentTransactionListEl, null, "Chưa có giao dịch gần đây.");
             updateBalance(allTransactions);
             updateChart(allTransactions);
             updateReportSummary(filteredTransactions);
+            if (views.budget.offsetParent !== null) renderBudgetView(); // Re-render budget if visible
         }
 
         function renderTransactionList(transactions, containerEl, emptyEl, emptyText = "Chưa có giao dịch nào.") {
             containerEl.innerHTML = '';
             if (emptyEl) containerEl.appendChild(emptyEl);
-
             if (transactions.length === 0) {
                 if (emptyEl) emptyEl.classList.remove('hidden');
                 else containerEl.innerHTML = `<p class="text-center p-8 text-gray-400">${emptyText}</p>`;
@@ -507,25 +566,7 @@
             const icon = isIncome ? 'fa-arrow-up' : 'fa-arrow-down';
             const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
             const formattedDate = createdAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-
-            item.innerHTML = `
-                <div class="flex items-center space-x-4 min-w-0">
-                    <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${isIncome ? 'bg-green-900' : 'bg-red-900'}">
-                        <i class="fas ${icon} ${amountColor}"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <p class="font-semibold text-gray-100 truncate">${description}</p>
-                        <p class="text-sm text-gray-400">${category || ''} <span class="mx-1">&bull;</span> ${formattedDate}</p>
-                    </div>
-                </div>
-                <div class="text-right flex-shrink-0 ml-4">
-                    <p class="font-bold ${amountColor}">${sign}${formattedAmount}</p>
-                    <div class="space-x-2 mt-1">
-                        <button data-id="${id}" class="edit-btn text-gray-400 hover:text-indigo-400 text-xs"><i class="fas fa-edit"></i> Sửa</button>
-                        <button data-id="${id}" class="delete-btn text-gray-400 hover:text-red-400 text-xs"><i class="fas fa-trash-alt"></i> Xóa</button>
-                    </div>
-                </div>
-            `;
+            item.innerHTML = `<div class="flex items-center space-x-4 min-w-0"><div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${isIncome ? 'bg-green-900' : 'bg-red-900'}"><i class="fas ${icon} ${amountColor}"></i></div><div class="min-w-0"><p class="font-semibold text-gray-100 truncate">${description}</p><p class="text-sm text-gray-400">${category || ''} <span class="mx-1">&bull;</span> ${formattedDate}</p></div></div><div class="text-right flex-shrink-0 ml-4"><p class="font-bold ${amountColor}">${sign}${formattedAmount}</p><div class="space-x-2 mt-1"><button data-id="${id}" class="edit-btn text-gray-400 hover:text-indigo-400 text-xs"><i class="fas fa-edit"></i> Sửa</button><button data-id="${id}" class="delete-btn text-gray-400 hover:text-red-400 text-xs"><i class="fas fa-trash-alt"></i> Xóa</button></div></div>`;
             containerEl.appendChild(item);
         }
 
@@ -549,29 +590,15 @@
         }
 
         function updateChart(transactions) {
-            const expenseData = transactions.filter(t => t.type === 'expense').reduce((acc, t) => {
-                acc[t.category] = (acc[t.category] || 0) + t.amount;
-                return acc;
-            }, {});
+            const expenseData = transactions.filter(t => t.type === 'expense').reduce((acc, t) => { acc[t.category] = (acc[t.category] || 0) + t.amount; return acc; }, {});
             const labels = Object.keys(expenseData);
             const data = Object.values(expenseData);
             if (expenseChart) expenseChart.destroy();
-            if (labels.length === 0) {
-                chartContainer.classList.add('hidden');
-                chartEmptyMessage.classList.remove('hidden');
-                return;
-            }
+            if (labels.length === 0) { chartContainer.classList.add('hidden'); chartEmptyMessage.classList.remove('hidden'); return; }
             chartContainer.classList.remove('hidden');
             chartEmptyMessage.classList.add('hidden');
             const ctx = document.getElementById('expenseChart').getContext('2d');
-            expenseChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{ data: data, backgroundColor: ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef'], borderColor: '#1f2937', borderWidth: 2 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 15, font: { size: 12 } } } } }
-            });
+            expenseChart = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef'], borderColor: '#1f2937', borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 15, font: { size: 12 } } } } } });
         }
 
         // --- FORM & CRUD ---
@@ -579,74 +606,26 @@
             const isExpense = currentTransactionType === 'expense';
             document.querySelector('.type-toggle-btn.expense').classList.toggle('active', isExpense);
             document.querySelector('.type-toggle-btn.income').classList.toggle('active', !isExpense);
-
             saveTransactionBtn.classList.toggle('bg-red-500', isExpense);
             saveTransactionBtn.classList.toggle('hover:bg-red-600', isExpense);
             saveTransactionBtn.classList.toggle('bg-green-500', !isExpense);
             saveTransactionBtn.classList.toggle('hover:bg-green-600', !isExpense);
-
             const iconClass = isExpense ? 'fa-minus-circle' : 'fa-plus-circle';
             saveTransactionBtn.innerHTML = `<i class="fas ${iconClass} mr-2"></i> Thêm Giao Dịch`;
         }
 
-        addModeToggle.addEventListener('click', (e) => {
-            const btn = e.target.closest('.type-toggle-btn');
-            if (btn) {
-                currentTransactionType = btn.dataset.type;
-                updateFormUI();
-            }
-        });
-
-        function setupFormForAdd() {
-            form.reset();
-            editingIdInput.value = '';
-            formTitle.textContent = 'Thêm giao dịch mới';
-            addModeToggle.classList.remove('hidden');
-            saveTransactionBtn.innerHTML = `<i class="fas fa-plus-circle mr-2"></i> Thêm Giao Dịch`;
-            currentTransactionType = 'expense';
-            updateFormUI();
-        }
-
-        function setupFormForEdit(id) {
-            const transaction = allTransactions.find(t => t.id === id);
-            if (!transaction) return;
-            editingIdInput.value = id;
-            descriptionInput.value = transaction.description;
-            amountInput.value = transaction.amount;
-            categoryInput.value = transaction.category;
-            formTitle.textContent = 'Sửa giao dịch';
-            addModeToggle.classList.add('hidden');
-            saveTransactionBtn.className = "w-full p-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-lg shadow-md transition";
-            saveTransactionBtn.innerHTML = `<i class="fas fa-save mr-2"></i> Lưu thay đổi`;
-            switchTab('add-edit');
-        }
+        addModeToggle.addEventListener('click', (e) => { const btn = e.target.closest('.type-toggle-btn'); if (btn) { currentTransactionType = btn.dataset.type; updateFormUI(); } });
+        function setupFormForAdd() { form.reset(); editingIdInput.value = ''; formTitle.textContent = 'Thêm giao dịch mới'; addModeToggle.classList.remove('hidden'); saveTransactionBtn.innerHTML = `<i class="fas fa-plus-circle mr-2"></i> Thêm Giao Dịch`; currentTransactionType = 'expense'; updateFormUI(); }
+        function setupFormForEdit(id) { const transaction = allTransactions.find(t => t.id === id); if (!transaction) return; editingIdInput.value = id; descriptionInput.value = transaction.description; amountInput.value = transaction.amount; categoryInput.value = transaction.category; formTitle.textContent = 'Sửa giao dịch'; addModeToggle.classList.add('hidden'); saveTransactionBtn.className = "w-full p-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-lg shadow-md transition"; saveTransactionBtn.innerHTML = `<i class="fas fa-save mr-2"></i> Lưu thay đổi`; switchTab('add-edit'); }
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             if (!descriptionInput.value || !amountInput.value) return;
             const id = editingIdInput.value;
-            if (id) { // Editing
+            if (id) {
                 const index = allTransactions.findIndex(t => t.id === id);
-                if (index > -1) {
-                    const originalTransaction = allTransactions[index];
-                    allTransactions[index] = {
-                        ...originalTransaction,
-                        description: descriptionInput.value,
-                        amount: +amountInput.value,
-                        category: categoryInput.value,
-                    };
-                }
-            } else { // Adding
-                const newTransaction = {
-                    id: crypto.randomUUID(),
-                    description: descriptionInput.value,
-                    amount: +amountInput.value,
-                    category: categoryInput.value,
-                    type: currentTransactionType,
-                    createdAt: new Date()
-                };
-                allTransactions.push(newTransaction);
-            }
+                if (index > -1) { const originalTransaction = allTransactions[index]; allTransactions[index] = { ...originalTransaction, description: descriptionInput.value, amount: +amountInput.value, category: categoryInput.value }; }
+            } else { allTransactions.push({ id: crypto.randomUUID(), description: descriptionInput.value, amount: +amountInput.value, category: categoryInput.value, type: currentTransactionType, createdAt: new Date() }); }
             Storage.set(TRANSACTIONS_KEY, allTransactions);
             processAndRenderData();
             setupFormForAdd();
@@ -655,89 +634,40 @@
 
         mainContentEl.addEventListener('click', (e) => {
             const editBtn = e.target.closest('.edit-btn');
-            if (editBtn) {
-                setupFormForEdit(editBtn.dataset.id);
-                return;
-            }
+            if (editBtn) { setupFormForEdit(editBtn.dataset.id); return; }
             const deleteBtn = e.target.closest('.delete-btn');
-            if (deleteBtn) {
-                transactionToDeleteId = deleteBtn.dataset.id;
-                deleteModal.classList.remove('hidden');
-            }
+            if (deleteBtn) { transactionToDeleteId = deleteBtn.dataset.id; deleteModal.classList.remove('hidden'); }
         });
 
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (!transactionToDeleteId) return;
-            allTransactions = allTransactions.filter(t => t.id !== transactionToDeleteId);
-            Storage.set(TRANSACTIONS_KEY, allTransactions);
-            processAndRenderData();
-            closeDeleteModal();
-        });
-
-        function closeDeleteModal() {
-            transactionToDeleteId = null;
-            deleteModal.classList.add('hidden');
-        }
+        confirmDeleteBtn.addEventListener('click', () => { if (!transactionToDeleteId) return; allTransactions = allTransactions.filter(t => t.id !== transactionToDeleteId); Storage.set(TRANSACTIONS_KEY, allTransactions); processAndRenderData(); closeDeleteModal(); });
+        function closeDeleteModal() { transactionToDeleteId = null; deleteModal.classList.add('hidden'); }
         cancelDeleteBtn.addEventListener('click', closeDeleteModal);
 
         // --- FILTERS ---
         function getDateRangeFromFilter() {
             const range = dateRangeFilter.value;
             const now = new Date();
-            let startDate = null;
-            let endDate = null;
-
+            let startDate = null, endDate = null;
             switch (range) {
-                case 'today':
-                    startDate = new Date(now.setHours(0, 0, 0, 0));
-                    endDate = new Date(now.setHours(23, 59, 59, 999));
-                    break;
-                case 'this_week':
-                    const firstDayOfWeek = now.getDate() - now.getDay();
-                    startDate = new Date(now.setDate(firstDayOfWeek));
-                    startDate.setHours(0, 0, 0, 0);
-                    endDate = new Date(startDate);
-                    endDate.setDate(startDate.getDate() + 6);
-                    endDate.setHours(23, 59, 59, 999);
-                    break;
-                case 'this_month':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-                    break;
-                case 'this_year':
-                    startDate = new Date(now.getFullYear(), 0, 1);
-                    endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
-                    break;
-                case 'custom':
-                    startDate = startDateInput.value ? new Date(startDateInput.value) : null;
-                    endDate = endDateInput.value ? new Date(endDateInput.value) : null;
-                    if (startDate) startDate.setHours(0, 0, 0, 0);
-                    if (endDate) endDate.setHours(23, 59, 59, 999);
-                    break;
+                case 'today': startDate = new Date(now.setHours(0, 0, 0, 0)); endDate = new Date(new Date().setHours(23, 59, 59, 999)); break;
+                case 'this_week': const dayOfWeek = now.getDay() === 0 ? 6 : now.getDay() - 1; startDate = new Date(new Date().setDate(now.getDate() - dayOfWeek)); startDate.setHours(0, 0, 0, 0); endDate = new Date(startDate); endDate.setDate(startDate.getDate() + 6); endDate.setHours(23, 59, 59, 999); break;
+                case 'this_month': startDate = new Date(now.getFullYear(), now.getMonth(), 1); endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999); break;
+                case 'this_year': startDate = new Date(now.getFullYear(), 0, 1); endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999); break;
+                case 'custom': startDate = startDateInput.value ? new Date(startDateInput.value) : null; endDate = endDateInput.value ? new Date(endDateInput.value) : null; if (startDate) startDate.setHours(0, 0, 0, 0); if (endDate) endDate.setHours(23, 59, 59, 999); break;
             }
             return { startDate, endDate };
         }
 
-        dateRangeFilter.addEventListener('change', () => {
-            if (dateRangeFilter.value === 'custom') {
-                customDateFilters.classList.remove('hidden');
-            } else {
-                customDateFilters.classList.add('hidden');
-                processAndRenderData();
-            }
-        });
+        dateRangeFilter.addEventListener('change', () => { if (dateRangeFilter.value === 'custom') { customDateFilters.classList.remove('hidden'); } else { customDateFilters.classList.add('hidden'); startDateInput.value = ''; endDateInput.value = ''; processAndRenderData(); } });
 
         // --- EXPORT ---
         exportCsvBtn.addEventListener('click', () => {
             let csvContent = "data:text/csv;charset=utf-8,ID,Mô tả,Số tiền,Loại,Danh mục,Ngày tạo\n";
-            allTransactions.forEach(t => {
-                const row = [t.id, `"${t.description.replace(/"/g, '""')}"`, t.amount, t.type, t.category, t.createdAt.toISOString()].join(",");
-                csvContent += row + "\n";
-            });
+            allTransactions.forEach(t => { const row = [t.id, `"${t.description.replace(/"/g, '""')}"`, t.amount, t.type, t.category, t.createdAt.toISOString()].join(","); csvContent += row + "\n"; });
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "transactions.csv");
+            link.setAttribute("download", `chi-tieu-${new Date().toISOString().slice(0, 10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -753,11 +683,7 @@
             switchTab('home');
 
             [searchInput, startDateInput, endDateInput].forEach(el => {
-                el.addEventListener('input', () => {
-                    dateRangeFilter.value = 'custom';
-                    customDateFilters.classList.remove('hidden');
-                    processAndRenderData();
-                });
+                el.addEventListener('input', () => { if (document.activeElement === startDateInput || document.activeElement === endDateInput) { dateRangeFilter.value = 'custom'; customDateFilters.classList.remove('hidden'); } processAndRenderData(); });
             });
         }
 
