@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Chi Tiêu Cá Nhân (Nâng cao)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        main {
+            padding-bottom: 100px;
+            /* Increased padding to prevent overlap */
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #374151;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #6b7280;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .view {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        #chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        .tab-btn.active {
+            color: #818cf8;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .type-toggle-btn.active {
+            font-weight: 700;
+            color: white;
+        }
+
+        .type-toggle-btn.expense.active {
+            background-color: #ef4444;
+        }
+
+        .type-toggle-btn.income.active {
+            background-color: #22c55e;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-200">
+
+    <div id="app" class="w-full min-h-screen bg-gray-800 flex flex-col relative">
+        <!-- Header -->
+        <header class="bg-indigo-800 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
+            <h1 id="header-title" class="text-xl font-bold">Trang chủ</h1>
+        </header>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="flex justify-center items-center p-8 flex-grow">
+            <i class="fas fa-spinner fa-spin fa-3x text-indigo-500"></i>
+        </div>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="p-4 md:p-6 flex-grow hidden">
+            <!-- Home View -->
+            <div id="home-view" class="view">
+                <section class="mb-6 p-6 bg-gray-700 rounded-xl shadow">
+                    <h2 class="text-sm font-medium text-gray-400 uppercase">Số dư hiện tại</h2>
+                    <p id="balance" class="text-4xl font-bold text-white mt-2">0 ₫</p>
+                </section>
+                <section class="mb-6 p-4 bg-gray-700 rounded-xl shadow">
+                    <h3 class="text-lg font-semibold mb-3 text-center">Biểu đồ chi tiêu</h3>
+                    <div id="chart-container"><canvas id="expenseChart"></canvas></div>
+                    <p id="chart-empty-message" class="text-center text-gray-400 hidden">Không có dữ liệu chi tiêu.</p>
+                </section>
+                <section>
+                    <h3 class="text-lg font-semibold mb-3 px-2">Giao dịch gần đây</h3>
+                    <div id="recent-transaction-list" class="bg-gray-700 rounded-xl shadow overflow-hidden"></div>
+                </section>
+            </div>
+
+            <!-- Add/Edit Transaction View -->
+            <div id="add-edit-view" class="view hidden">
+                <form id="transaction-form" class="space-y-4 p-4 bg-gray-700 rounded-xl shadow">
+                    <h3 id="form-title" class="text-lg font-semibold text-center">Thêm giao dịch mới</h3>
+                    <input type="hidden" id="editing-id">
+
+                    <!-- Add Mode Toggle -->
+                    <div id="add-mode-toggle" class="grid grid-cols-2 gap-2 p-1 bg-gray-600 rounded-lg">
+                        <button type="button" data-type="expense"
+                            class="type-toggle-btn expense p-2 rounded-md text-sm transition">Chi tiêu</button>
+                        <button type="button" data-type="income"
+                            class="type-toggle-btn income p-2 rounded-md text-sm transition">Thu nhập</button>
+                    </div>
+
+                    <input type="text" id="description" placeholder="Mô tả"
+                        class="w-full p-3 bg-gray-600 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                        required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="number" id="amount" placeholder="Số tiền"
+                            class="p-3 bg-gray-600 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                            required>
+                        <select id="category"
+                            class="p-3 bg-gray-600 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                            required></select>
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" id="save-transaction-btn"
+                            class="w-full p-3 text-white font-bold rounded-lg shadow-md transition">
+                            <i class="fas fa-plus-circle mr-2"></i> Thêm Giao Dịch
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Reports View -->
+            <div id="reports-view" class="view hidden">
+                <section class="mb-6 p-4 bg-gray-700 rounded-xl shadow">
+                    <h3 class="text-lg font-semibold mb-3">Bộ lọc & Tìm kiếm</h3>
+                    <input type="search" id="search-input" placeholder="Tìm theo mô tả..."
+                        class="w-full mb-4 p-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-200">
+                    <select id="date-range-filter"
+                        class="w-full mb-4 p-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-200">
+                        <option value="all">Toàn bộ thời gian</option>
+                        <option value="today">Hôm nay</option>
+                        <option value="this_week">Tuần này</option>
+                        <option value="this_month">Tháng này</option>
+                        <option value="this_year">Năm nay</option>
+                        <option value="custom">Tùy chỉnh...</option>
+                    </select>
+                    <div id="custom-date-filters" class="grid grid-cols-2 gap-4 hidden">
+                        <div>
+                            <label for="startDate" class="text-sm font-medium text-gray-300">Từ ngày</label>
+                            <input type="date" id="startDate"
+                                class="w-full mt-1 p-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-200">
+                        </div>
+                        <div>
+                            <label for="endDate" class="text-sm font-medium text-gray-300">Đến ngày</label>
+                            <input type="date" id="endDate"
+                                class="w-full mt-1 p-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-200">
+                        </div>
+                    </div>
+                </section>
+                <section class="mb-6 p-4 bg-gray-700 rounded-xl shadow">
+                    <h3 class="text-lg font-semibold mb-3">Thống kê giai đoạn</h3>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p class="text-sm text-green-400">Tổng thu</p>
+                            <p id="report-income" class="font-bold text-lg">0 ₫</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-red-400">Tổng chi</p>
+                            <p id="report-expense" class="font-bold text-lg">0 ₫</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Chênh lệch</p>
+                            <p id="report-net" class="font-bold text-lg">0 ₫</p>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <div id="full-transaction-list" class="bg-gray-700 rounded-xl shadow overflow-hidden">
+                        <div id="empty-state" class="text-center p-8 text-gray-400 hidden">
+                            <i class="fas fa-receipt fa-3x mb-4"></i>
+                            <p>Không có giao dịch nào.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="view hidden">
+                <section class="mb-6 p-4 bg-gray-700 rounded-xl shadow">
+                    <h3 class="text-lg font-semibold mb-3">Quản lý danh mục</h3>
+                    <ul id="category-list" class="space-y-2 mb-4"></ul>
+                    <form id="add-category-form" class="flex gap-2">
+                        <input type="text" id="new-category-name" placeholder="Tên danh mục mới"
+                            class="flex-grow p-2 bg-gray-600 border border-gray-500 rounded-lg" required>
+                        <button type="submit" class="p-2 bg-indigo-500 rounded-lg text-white font-bold"><i
+                                class="fas fa-plus"></i></button>
+                    </form>
+                </section>
+                <section class="p-4 bg-gray-700 rounded-xl shadow">
+                    <h3 class="text-lg font-semibold mb-3">Quản lý dữ liệu</h3>
+                    <button id="export-csv"
+                        class="w-full p-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition">
+                        <i class="fas fa-file-csv mr-2"></i> Xuất ra file CSV
+                    </button>
+                </section>
+            </div>
+        </main>
+
+        <!-- Bottom Tab Navigation -->
+        <nav id="tab-nav" class="w-full fixed bottom-0 bg-gray-800 border-t border-gray-700 flex justify-around">
+            <button data-tab="home" class="tab-btn flex-1 p-3 text-center text-gray-400"><i
+                    class="fas fa-home text-xl"></i><span class="text-xs block mt-1">Trang chủ</span></button>
+            <button data-tab="add-edit" class="tab-btn flex-1 p-3 text-center text-gray-400"><i
+                    class="fas fa-plus-circle text-xl"></i><span class="text-xs block mt-1">Thêm mới</span></button>
+            <button data-tab="reports" class="tab-btn flex-1 p-3 text-center text-gray-400"><i
+                    class="fas fa-chart-pie text-xl"></i><span class="text-xs block mt-1">Báo cáo</span></button>
+            <button data-tab="settings" class="tab-btn flex-1 p-3 text-center text-gray-400"><i
+                    class="fas fa-cog text-xl"></i><span class="text-xs block mt-1">Cài đặt</span></button>
+        </nav>
+    </div>
+
+    <!-- Modals -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
+        <div class="bg-gray-800 rounded-lg p-6 w-11/12 max-w-sm text-center shadow-xl">
+            <h3 class="text-lg font-bold mb-4">Xác nhận xóa</h3>
+            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa giao dịch này không?</p>
+            <div class="flex justify-center space-x-4">
+                <button id="cancelDelete" class="px-6 py-2 bg-gray-600 rounded-lg">Hủy</button>
+                <button id="confirmDelete" class="px-6 py-2 bg-red-500 text-white rounded-lg">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editCategoryModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
+        <div class="bg-gray-800 rounded-lg p-6 w-11/12 max-w-sm shadow-xl">
+            <h3 class="text-lg font-bold mb-4 text-center">Sửa tên danh mục</h3>
+            <form id="edit-category-form">
+                <input type="hidden" id="old-category-name">
+                <input type="text" id="edit-category-name"
+                    class="w-full p-2 bg-gray-600 border border-gray-500 rounded-lg" required>
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" id="cancelEditCategory" class="px-6 py-2 bg-gray-600 rounded-lg">Hủy</button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-500 text-white rounded-lg">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // --- GLOBAL STATE & VARIABLES ---
+        const TRANSACTIONS_KEY = 'expenseTrackerTransactions_v2';
+        const CATEGORIES_KEY = 'expenseTrackerCategories_v2';
+        let transactionToDeleteId = null;
+        let expenseChart = null;
+        let allTransactions = [];
+        let allCategories = [];
+        let currentTransactionType = 'expense'; // Default type for new transactions
+
+        // --- DOM ELEMENTS ---
+        const loadingEl = document.getElementById('loading');
+        const mainContentEl = document.getElementById('mainContent');
+        const headerTitleEl = document.getElementById('header-title');
+        const views = {
+            home: document.getElementById('home-view'),
+            'add-edit': document.getElementById('add-edit-view'),
+            reports: document.getElementById('reports-view'),
+            settings: document.getElementById('settings-view'),
+        };
+        const balanceEl = document.getElementById('balance');
+        const chartContainer = document.getElementById('chart-container');
+        const chartEmptyMessage = document.getElementById('chart-empty-message');
+        const recentTransactionListEl = document.getElementById('recent-transaction-list');
+        const form = document.getElementById('transaction-form');
+        const formTitle = document.getElementById('form-title');
+        const editingIdInput = document.getElementById('editing-id');
+        const addModeToggle = document.getElementById('add-mode-toggle');
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const categoryInput = document.getElementById('category');
+        const saveTransactionBtn = document.getElementById('save-transaction-btn');
+        const fullTransactionListEl = document.getElementById('full-transaction-list');
+        const emptyStateEl = document.getElementById('empty-state');
+        const searchInput = document.getElementById('search-input');
+        const dateRangeFilter = document.getElementById('date-range-filter');
+        const customDateFilters = document.getElementById('custom-date-filters');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const reportIncomeEl = document.getElementById('report-income');
+        const reportExpenseEl = document.getElementById('report-expense');
+        const reportNetEl = document.getElementById('report-net');
+        const categoryListEl = document.getElementById('category-list');
+        const addCategoryForm = document.getElementById('add-category-form');
+        const newCategoryNameInput = document.getElementById('new-category-name');
+        const exportCsvBtn = document.getElementById('export-csv');
+        const deleteModal = document.getElementById('deleteModal');
+        const cancelDeleteBtn = document.getElementById('cancelDelete');
+        const confirmDeleteBtn = document.getElementById('confirmDelete');
+        const tabNav = document.getElementById('tab-nav');
+        const editCategoryModal = document.getElementById('editCategoryModal');
+        const editCategoryForm = document.getElementById('edit-category-form');
+        const oldCategoryNameInput = document.getElementById('old-category-name');
+        const editCategoryNameInput = document.getElementById('edit-category-name');
+        const cancelEditCategoryBtn = document.getElementById('cancelEditCategory');
+
+        // --- DATA MANAGEMENT (localStorage) ---
+        const Storage = {
+            get: (key) => JSON.parse(localStorage.getItem(key) || '[]'),
+            set: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+        };
+
+        function loadData() {
+            allTransactions = Storage.get(TRANSACTIONS_KEY).map(t => ({ ...t, createdAt: new Date(t.createdAt) }));
+            allCategories = Storage.get(CATEGORIES_KEY);
+            if (allCategories.length === 0) {
+                allCategories = ["Ăn uống", "Di chuyển", "Giải trí", "Mua sắm", "Hóa đơn", "Sức khỏe", "Thu nhập", "Khác"];
+                Storage.set(CATEGORIES_KEY, allCategories);
+            }
+        }
+
+        // --- NAVIGATION ---
+        const switchTab = (tabName) => {
+            Object.values(views).forEach(view => view.classList.add('hidden'));
+            if (views[tabName]) views[tabName].classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const titles = { home: 'Trang chủ', 'add-edit': 'Thêm/Sửa Giao dịch', reports: 'Báo cáo', settings: 'Cài đặt' };
+            headerTitleEl.textContent = titles[tabName] || 'Trang chủ';
+        };
+
+        tabNav.addEventListener('click', (e) => {
+            const tabButton = e.target.closest('.tab-btn');
+            if (tabButton) {
+                if (tabButton.dataset.tab === 'add-edit') {
+                    setupFormForAdd();
+                }
+                switchTab(tabButton.dataset.tab);
+            }
+        });
+
+        // --- CATEGORY MANAGEMENT ---
+        function renderCategories() {
+            categoryListEl.innerHTML = '';
+            allCategories.forEach(cat => {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center p-2 bg-gray-600 rounded';
+                li.innerHTML = `
+                    <span>${cat}</span>
+                    <div class="space-x-3">
+                        <button data-category="${cat}" class="edit-category-btn text-indigo-400 hover:text-indigo-300"><i class="fas fa-edit"></i></button>
+                        <button data-category="${cat}" class="delete-category-btn text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                categoryListEl.appendChild(li);
+            });
+            populateCategoryDropdown();
+        }
+
+        function populateCategoryDropdown() {
+            const currentCategory = categoryInput.value;
+            categoryInput.innerHTML = allCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            if (allCategories.includes(currentCategory)) {
+                categoryInput.value = currentCategory;
+            }
+        }
+
+        addCategoryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newCat = newCategoryNameInput.value.trim();
+            if (newCat && !allCategories.find(c => c.toLowerCase() === newCat.toLowerCase())) {
+                allCategories.push(newCat);
+                Storage.set(CATEGORIES_KEY, allCategories);
+                renderCategories();
+                newCategoryNameInput.value = '';
+            }
+        });
+
+        categoryListEl.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.delete-category-btn');
+            if (deleteBtn) {
+                const catToDelete = deleteBtn.dataset.category;
+                allCategories = allCategories.filter(c => c !== catToDelete);
+                Storage.set(CATEGORIES_KEY, allCategories);
+                renderCategories();
+            }
+            const editBtn = e.target.closest('.edit-category-btn');
+            if (editBtn) {
+                showEditCategoryModal(editBtn.dataset.category);
+            }
+        });
+
+        function showEditCategoryModal(oldName) {
+            oldCategoryNameInput.value = oldName;
+            editCategoryNameInput.value = oldName;
+            editCategoryModal.classList.remove('hidden');
+            editCategoryNameInput.focus();
+        }
+
+        function closeEditCategoryModal() {
+            editCategoryModal.classList.add('hidden');
+        }
+
+        editCategoryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const oldName = oldCategoryNameInput.value;
+            const newName = editCategoryNameInput.value.trim();
+
+            if (!newName || newName === oldName) {
+                closeEditCategoryModal();
+                return;
+            }
+
+            if (allCategories.find(c => c.toLowerCase() === newName.toLowerCase())) {
+                alert('Tên danh mục đã tồn tại.');
+                return;
+            }
+
+            const categoryIndex = allCategories.findIndex(c => c === oldName);
+            if (categoryIndex > -1) {
+                allCategories[categoryIndex] = newName;
+            }
+
+            allTransactions.forEach(t => {
+                if (t.category === oldName) {
+                    t.category = newName;
+                }
+            });
+
+            Storage.set(CATEGORIES_KEY, allCategories);
+            Storage.set(TRANSACTIONS_KEY, allTransactions);
+            renderCategories();
+            processAndRenderData();
+            closeEditCategoryModal();
+        });
+        cancelEditCategoryBtn.addEventListener('click', closeEditCategoryModal);
+
+
+        // --- DATA PROCESSING & RENDERING ---
+        function getFilteredTransactions() {
+            allTransactions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+            const searchTerm = searchInput.value.toLowerCase();
+            const { startDate, endDate } = getDateRangeFromFilter();
+
+            return allTransactions.filter(t => {
+                const tDate = t.createdAt;
+                const matchesSearch = t.description.toLowerCase().includes(searchTerm);
+                const matchesDate = (!startDate || tDate >= startDate) && (!endDate || tDate <= endDate);
+                return matchesSearch && matchesDate;
+            });
+        }
+
+        function processAndRenderData() {
+            const filteredTransactions = getFilteredTransactions();
+
+            renderTransactionList(filteredTransactions, fullTransactionListEl, emptyStateEl);
+            renderTransactionList(allTransactions.slice(0, 5), recentTransactionListEl, null, "Chưa có giao dịch gần đây.");
+            updateBalance(allTransactions);
+            updateChart(allTransactions);
+            updateReportSummary(filteredTransactions);
+        }
+
+        function renderTransactionList(transactions, containerEl, emptyEl, emptyText = "Chưa có giao dịch nào.") {
+            containerEl.innerHTML = '';
+            if (emptyEl) containerEl.appendChild(emptyEl);
+
+            if (transactions.length === 0) {
+                if (emptyEl) emptyEl.classList.remove('hidden');
+                else containerEl.innerHTML = `<p class="text-center p-8 text-gray-400">${emptyText}</p>`;
+            } else {
+                if (emptyEl) emptyEl.classList.add('hidden');
+                transactions.forEach(t => addTransactionToDOM(t, containerEl));
+            }
+        }
+
+        function addTransactionToDOM(transaction, containerEl) {
+            const { id, description, amount, type, createdAt, category } = transaction;
+            const item = document.createElement('div');
+            item.className = 'flex items-center justify-between p-4 border-b border-gray-600';
+            const isIncome = type === 'income';
+            const sign = isIncome ? '+' : '-';
+            const amountColor = isIncome ? 'text-green-400' : 'text-red-400';
+            const icon = isIncome ? 'fa-arrow-up' : 'fa-arrow-down';
+            const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+            const formattedDate = createdAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+
+            item.innerHTML = `
+                <div class="flex items-center space-x-4 min-w-0">
+                    <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${isIncome ? 'bg-green-900' : 'bg-red-900'}">
+                        <i class="fas ${icon} ${amountColor}"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="font-semibold text-gray-100 truncate">${description}</p>
+                        <p class="text-sm text-gray-400">${category || ''} <span class="mx-1">&bull;</span> ${formattedDate}</p>
+                    </div>
+                </div>
+                <div class="text-right flex-shrink-0 ml-4">
+                    <p class="font-bold ${amountColor}">${sign}${formattedAmount}</p>
+                    <div class="space-x-2 mt-1">
+                        <button data-id="${id}" class="edit-btn text-gray-400 hover:text-indigo-400 text-xs"><i class="fas fa-edit"></i> Sửa</button>
+                        <button data-id="${id}" class="delete-btn text-gray-400 hover:text-red-400 text-xs"><i class="fas fa-trash-alt"></i> Xóa</button>
+                    </div>
+                </div>
+            `;
+            containerEl.appendChild(item);
+        }
+
+        function updateBalance(transactions) {
+            const total = transactions.reduce((acc, t) => t.type === 'income' ? acc + t.amount : acc - t.amount, 0);
+            balanceEl.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total);
+            balanceEl.classList.toggle('text-red-400', total < 0);
+            balanceEl.classList.toggle('text-green-400', total >= 0);
+        }
+
+        function updateReportSummary(transactions) {
+            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const net = income - expense;
+            const format = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+            reportIncomeEl.textContent = format(income);
+            reportExpenseEl.textContent = format(expense);
+            reportNetEl.textContent = format(net);
+            reportNetEl.classList.toggle('text-red-400', net < 0);
+            reportNetEl.classList.toggle('text-green-400', net >= 0);
+        }
+
+        function updateChart(transactions) {
+            const expenseData = transactions.filter(t => t.type === 'expense').reduce((acc, t) => {
+                acc[t.category] = (acc[t.category] || 0) + t.amount;
+                return acc;
+            }, {});
+            const labels = Object.keys(expenseData);
+            const data = Object.values(expenseData);
+            if (expenseChart) expenseChart.destroy();
+            if (labels.length === 0) {
+                chartContainer.classList.add('hidden');
+                chartEmptyMessage.classList.remove('hidden');
+                return;
+            }
+            chartContainer.classList.remove('hidden');
+            chartEmptyMessage.classList.add('hidden');
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            expenseChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: data, backgroundColor: ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef'], borderColor: '#1f2937', borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 15, font: { size: 12 } } } } }
+            });
+        }
+
+        // --- FORM & CRUD ---
+        function updateFormUI() {
+            const isExpense = currentTransactionType === 'expense';
+            document.querySelector('.type-toggle-btn.expense').classList.toggle('active', isExpense);
+            document.querySelector('.type-toggle-btn.income').classList.toggle('active', !isExpense);
+
+            saveTransactionBtn.classList.toggle('bg-red-500', isExpense);
+            saveTransactionBtn.classList.toggle('hover:bg-red-600', isExpense);
+            saveTransactionBtn.classList.toggle('bg-green-500', !isExpense);
+            saveTransactionBtn.classList.toggle('hover:bg-green-600', !isExpense);
+
+            const iconClass = isExpense ? 'fa-minus-circle' : 'fa-plus-circle';
+            saveTransactionBtn.innerHTML = `<i class="fas ${iconClass} mr-2"></i> Thêm Giao Dịch`;
+        }
+
+        addModeToggle.addEventListener('click', (e) => {
+            const btn = e.target.closest('.type-toggle-btn');
+            if (btn) {
+                currentTransactionType = btn.dataset.type;
+                updateFormUI();
+            }
+        });
+
+        function setupFormForAdd() {
+            form.reset();
+            editingIdInput.value = '';
+            formTitle.textContent = 'Thêm giao dịch mới';
+            addModeToggle.classList.remove('hidden');
+            saveTransactionBtn.innerHTML = `<i class="fas fa-plus-circle mr-2"></i> Thêm Giao Dịch`;
+            currentTransactionType = 'expense';
+            updateFormUI();
+        }
+
+        function setupFormForEdit(id) {
+            const transaction = allTransactions.find(t => t.id === id);
+            if (!transaction) return;
+            editingIdInput.value = id;
+            descriptionInput.value = transaction.description;
+            amountInput.value = transaction.amount;
+            categoryInput.value = transaction.category;
+            formTitle.textContent = 'Sửa giao dịch';
+            addModeToggle.classList.add('hidden');
+            saveTransactionBtn.className = "w-full p-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-lg shadow-md transition";
+            saveTransactionBtn.innerHTML = `<i class="fas fa-save mr-2"></i> Lưu thay đổi`;
+            switchTab('add-edit');
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!descriptionInput.value || !amountInput.value) return;
+            const id = editingIdInput.value;
+            if (id) { // Editing
+                const index = allTransactions.findIndex(t => t.id === id);
+                if (index > -1) {
+                    const originalTransaction = allTransactions[index];
+                    allTransactions[index] = {
+                        ...originalTransaction,
+                        description: descriptionInput.value,
+                        amount: +amountInput.value,
+                        category: categoryInput.value,
+                    };
+                }
+            } else { // Adding
+                const newTransaction = {
+                    id: crypto.randomUUID(),
+                    description: descriptionInput.value,
+                    amount: +amountInput.value,
+                    category: categoryInput.value,
+                    type: currentTransactionType,
+                    createdAt: new Date()
+                };
+                allTransactions.push(newTransaction);
+            }
+            Storage.set(TRANSACTIONS_KEY, allTransactions);
+            processAndRenderData();
+            setupFormForAdd();
+            switchTab('reports');
+        });
+
+        mainContentEl.addEventListener('click', (e) => {
+            const editBtn = e.target.closest('.edit-btn');
+            if (editBtn) {
+                setupFormForEdit(editBtn.dataset.id);
+                return;
+            }
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                transactionToDeleteId = deleteBtn.dataset.id;
+                deleteModal.classList.remove('hidden');
+            }
+        });
+
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (!transactionToDeleteId) return;
+            allTransactions = allTransactions.filter(t => t.id !== transactionToDeleteId);
+            Storage.set(TRANSACTIONS_KEY, allTransactions);
+            processAndRenderData();
+            closeDeleteModal();
+        });
+
+        function closeDeleteModal() {
+            transactionToDeleteId = null;
+            deleteModal.classList.add('hidden');
+        }
+        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+        // --- FILTERS ---
+        function getDateRangeFromFilter() {
+            const range = dateRangeFilter.value;
+            const now = new Date();
+            let startDate = null;
+            let endDate = null;
+
+            switch (range) {
+                case 'today':
+                    startDate = new Date(now.setHours(0, 0, 0, 0));
+                    endDate = new Date(now.setHours(23, 59, 59, 999));
+                    break;
+                case 'this_week':
+                    const firstDayOfWeek = now.getDate() - now.getDay();
+                    startDate = new Date(now.setDate(firstDayOfWeek));
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + 6);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+                case 'this_month':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+                    break;
+                case 'this_year':
+                    startDate = new Date(now.getFullYear(), 0, 1);
+                    endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+                    break;
+                case 'custom':
+                    startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+                    endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+                    if (startDate) startDate.setHours(0, 0, 0, 0);
+                    if (endDate) endDate.setHours(23, 59, 59, 999);
+                    break;
+            }
+            return { startDate, endDate };
+        }
+
+        dateRangeFilter.addEventListener('change', () => {
+            if (dateRangeFilter.value === 'custom') {
+                customDateFilters.classList.remove('hidden');
+            } else {
+                customDateFilters.classList.add('hidden');
+                processAndRenderData();
+            }
+        });
+
+        // --- EXPORT ---
+        exportCsvBtn.addEventListener('click', () => {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Mô tả,Số tiền,Loại,Danh mục,Ngày tạo\n";
+            allTransactions.forEach(t => {
+                const row = [t.id, `"${t.description.replace(/"/g, '""')}"`, t.amount, t.type, t.category, t.createdAt.toISOString()].join(",");
+                csvContent += row + "\n";
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "transactions.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // --- INITIAL APP SETUP ---
+        function initializeApp() {
+            loadData();
+            renderCategories();
+            processAndRenderData();
+            loadingEl.classList.add('hidden');
+            mainContentEl.classList.remove('hidden');
+            switchTab('home');
+
+            [searchInput, startDateInput, endDateInput].forEach(el => {
+                el.addEventListener('input', () => {
+                    dateRangeFilter.value = 'custom';
+                    customDateFilters.classList.remove('hidden');
+                    processAndRenderData();
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+
+</html>
