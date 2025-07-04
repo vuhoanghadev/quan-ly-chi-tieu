@@ -921,106 +921,6 @@
                     appearance: none !important;
                 }
             }
-
-            /* iOS PWA Touch Optimization */
-            .pwa-mode {
-                -webkit-touch-callout: none;
-                -webkit-user-select: none;
-                user-select: none;
-                -webkit-tap-highlight-color: transparent;
-                touch-action: manipulation;
-            }
-
-            /* Optimize touch targets */
-            .touch-target,
-            button,
-            .tab-btn,
-            input,
-            select {
-                touch-action: manipulation;
-                -webkit-tap-highlight-color: transparent;
-                -webkit-touch-callout: none;
-                user-select: none;
-                -webkit-user-select: none;
-            }
-
-            /* Prevent text selection on UI elements */
-            .tab-btn,
-            .transaction-item,
-            .action-buttons,
-            #add-fab {
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-                -webkit-touch-callout: none;
-            }
-
-            /* Smooth scrolling for iOS */
-            #mainContent,
-            .view {
-                -webkit-overflow-scrolling: touch;
-            }
-
-            /* Prevent zoom on double tap */
-            * {
-                touch-action: manipulation;
-            }
-
-            /* Allow text selection only in inputs */
-            input,
-            textarea {
-                -webkit-user-select: text;
-                -moz-user-select: text;
-                -ms-user-select: text;
-                user-select: text;
-                touch-action: manipulation;
-            }
-
-            /* Performance optimizations for iOS PWA */
-            .pwa-mode * {
-                -webkit-transform: translateZ(0);
-                transform: translateZ(0);
-                -webkit-backface-visibility: hidden;
-                backface-visibility: hidden;
-            }
-
-            /* Optimize animations for 60fps */
-            .pwa-mode .view,
-            .pwa-mode #modal-content,
-            .pwa-mode .tab-btn {
-                will-change: transform, opacity;
-                contain: layout style paint;
-            }
-
-            /* Reduce repaints */
-            .pwa-mode .transaction-item,
-            .pwa-mode .touch-target {
-                contain: layout style;
-            }
-
-            /* iOS specific button optimizations */
-            @supports (-webkit-touch-callout: none) {
-
-                button,
-                .touch-target {
-                    cursor: pointer;
-                    -webkit-tap-highlight-color: rgba(99, 102, 241, 0.1);
-                    transition: background-color 0.15s ease;
-                }
-
-                button:active,
-                .touch-target:active {
-                    background-color: rgba(99, 102, 241, 0.1);
-                    transform: scale(0.98);
-                }
-
-                /* Prevent button bounce */
-                button:disabled {
-                    pointer-events: none;
-                    opacity: 0.6;
-                }
-            }
         }
     </style>
 </head>
@@ -1884,47 +1784,6 @@
                 this.setupKeyboardShortcuts();
                 this.setupSmartFocus();
                 this.setupContextualHelp();
-                this.setupOptimizedTouchHandling();
-            },
-
-            setupOptimizedTouchHandling() {
-                // Tối ưu touch handling cho iOS PWA
-                let touchStartTime = 0;
-                let touchStartPos = { x: 0, y: 0 };
-
-                // Optimized touch start
-                document.addEventListener('touchstart', (e) => {
-                    touchStartTime = Date.now();
-                    if (e.touches.length === 1) {
-                        touchStartPos.x = e.touches[0].clientX;
-                        touchStartPos.y = e.touches[0].clientY;
-                    }
-                }, { passive: true });
-
-                // Prevent accidental touches
-                document.addEventListener('touchend', (e) => {
-                    const touchDuration = Date.now() - touchStartTime;
-                    const touch = e.changedTouches[0];
-                    const deltaX = Math.abs(touch.clientX - touchStartPos.x);
-                    const deltaY = Math.abs(touch.clientY - touchStartPos.y);
-
-                    // Nếu touch quá ngắn hoặc di chuyển quá nhiều, có thể là accidental
-                    if (touchDuration < 50 || (deltaX > 10 || deltaY > 10)) {
-                        // Không làm gì để tránh accidental touches
-                        return;
-                    }
-                }, { passive: true });
-
-                // Debounce rapid touches
-                let lastTouchTime = 0;
-                document.addEventListener('touchstart', (e) => {
-                    const now = Date.now();
-                    if (now - lastTouchTime < 100) {
-                        // Quá nhanh, có thể là double touch không mong muốn
-                        e.stopPropagation();
-                    }
-                    lastTouchTime = now;
-                }, { passive: false });
             },
 
             setupDoubleClickToEdit() {
@@ -2503,50 +2362,11 @@
             openAddEditModal();
         }
 
-        // --- DEBOUNCED FUNCTIONS ---
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        function throttle(func, limit) {
-            let inThrottle;
-            return function () {
-                const args = arguments;
-                const context = this;
-                if (!inThrottle) {
-                    func.apply(context, args);
-                    inThrottle = true;
-                    setTimeout(() => inThrottle = false, limit);
-                }
-            }
-        }
-
         // --- EVENT LISTENERS ---
         function setupEventListeners() {
-            // Debounced tab switching để tránh multiple clicks
-            const debouncedSwitchTab = debounce((tabName) => {
-                switchTab(tabName);
-            }, 150);
-
             tabNav.addEventListener('click', (e) => {
                 const tabButton = e.target.closest('.tab-btn');
-                if (tabButton && !tabButton.disabled) {
-                    // Disable button temporarily để tránh double clicks
-                    tabButton.disabled = true;
-                    setTimeout(() => {
-                        tabButton.disabled = false;
-                    }, 200);
-
-                    debouncedSwitchTab(tabButton.dataset.tab);
-                }
+                if (tabButton) switchTab(tabButton.dataset.tab);
             });
 
             // ⭐ SỰ KIỆN CHO NÚT TOGGLE ĐÃ ĐƯỢC PHỤC HỒI
@@ -2646,18 +2466,7 @@
                 }
             });
 
-            // Debounced FAB click để tránh multiple modal opens
-            const debouncedSetupFormForAdd = debounce(() => {
-                if (!addEditModal.classList.contains('modal-show')) {
-                    setupFormForAdd();
-                }
-            }, 200);
-
-            addFab.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                debouncedSetupFormForAdd();
-            });
+            addFab.addEventListener('click', setupFormForAdd);
             closeModalBtn.addEventListener('click', closeAddEditModal); // ⭐ Gán sự kiện cho nút đóng modal
 
             mainContentEl.addEventListener('click', (e) => {
@@ -2897,14 +2706,17 @@
                 });
             });
 
-            // Tối ưu scroll handling cho iOS
-            const throttledScrollHandler = throttle(() => {
-                if (currentTab) {
-                    tabScrollPositions[currentTab] = window.pageYOffset || document.documentElement.scrollTop;
-                }
-            }, 50);
-
-            window.addEventListener('scroll', throttledScrollHandler, { passive: true });
+            // Lưu vị trí cuộn khi người dùng cuộn
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                // Debounce để tối ưu performance
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if (currentTab) {
+                        tabScrollPositions[currentTab] = window.pageYOffset || document.documentElement.scrollTop;
+                    }
+                }, 100);
+            }, { passive: true });
         }
 
         // --- FILTERS ---
@@ -3243,20 +3055,12 @@
                         setTimeout(setViewportHeight, 100);
                     });
 
-                    // Ngăn chặn scroll bounce - chỉ áp dụng cho body, không can thiệp vào UI elements
-                    let isScrolling = false;
-                    document.addEventListener('touchstart', () => {
-                        isScrolling = false;
-                    }, { passive: true });
-
+                    // Ngăn chặn scroll bounce
                     document.addEventListener('touchmove', (e) => {
-                        // Chỉ ngăn scroll bounce ở body, không can thiệp vào các elements tương tác
-                        if (e.target === document.body || e.target === document.documentElement) {
-                            if (window.pageYOffset <= 0) {
-                                e.preventDefault();
-                            }
+                        if (e.target.closest('#mainContent') || e.target.closest('#add-edit-modal')) {
+                            return;
                         }
-                        isScrolling = true;
+                        e.preventDefault();
                     }, { passive: false });
                 }
             }
