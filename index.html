@@ -58,6 +58,59 @@
             font-family: 'Be Vietnam Pro', sans-serif;
         }
 
+        /* Universal Form Element Styling for iOS Compatibility */
+        input,
+        select,
+        textarea,
+        button {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 16px;
+            /* Prevents zoom on iOS */
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+
+        /* Select specific styling */
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        /* Ensure consistent height across all form elements */
+        input[type="text"],
+        input[type="search"],
+        input[type="date"],
+        select {
+            min-height: 44px;
+            height: auto;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+        }
+
+        /* iOS Safari specific fixes */
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            select {
+                background-color: #374151;
+                border: 1px solid #4b5563;
+                color: #e5e7eb;
+            }
+
+            select:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px #6366f1;
+                border-color: #6366f1;
+            }
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
@@ -119,7 +172,12 @@
 
         /* Active Tab Button */
         .tab-btn.active {
-            color: #818cf8;
+            color: #818cf8 !important;
+        }
+
+        /* Đảm bảo active state luôn có ưu tiên cao nhất */
+        .tab-btn.active:hover {
+            color: #818cf8 !important;
         }
 
         /* Date Picker Icon Color */
@@ -359,8 +417,22 @@
             input,
             select,
             button {
-                font-size: 16px;
+                font-size: 16px !important;
                 /* Prevents zoom on iOS */
+                min-height: 44px !important;
+                /* iOS minimum touch target */
+                box-sizing: border-box !important;
+            }
+
+            /* Đảm bảo select có appearance đồng nhất */
+            select {
+                -webkit-appearance: none !important;
+                appearance: none !important;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+                background-repeat: no-repeat !important;
+                background-position: right 0.75rem center !important;
+                background-size: 1rem !important;
+                padding-right: 2.5rem !important;
             }
 
 
@@ -698,6 +770,60 @@
                 pointer-events: none;
             }
 
+            /* iOS Select Fix */
+            select {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                background-size: 1rem;
+                padding-right: 2.5rem !important;
+                min-height: 44px;
+                /* iOS minimum touch target */
+                line-height: 1.5;
+                vertical-align: middle;
+            }
+
+            /* Đảm bảo tất cả select có chiều cao đồng nhất */
+            select,
+            input[type="text"],
+            input[type="search"],
+            input[type="date"] {
+                min-height: 44px !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            /* iOS specific fixes */
+            @supports (-webkit-touch-callout: none) {
+                select {
+                    font-size: 16px !important;
+                    /* Ngăn zoom trên iOS */
+                    -webkit-appearance: none !important;
+                    appearance: none !important;
+                    border-radius: 0.5rem !important;
+                    background-color: #374151 !important;
+                    border: 1px solid #4b5563 !important;
+                    color: #e5e7eb !important;
+                }
+
+                select:focus {
+                    outline: none !important;
+                    box-shadow: 0 0 0 2px #6366f1 !important;
+                    border-color: #6366f1 !important;
+                }
+
+                /* Đảm bảo option text hiển thị đúng */
+                select option {
+                    background-color: #374151 !important;
+                    color: #e5e7eb !important;
+                    padding: 0.5rem !important;
+                }
+            }
+
             /* Improved mobile filter layout */
             @media (max-width: 640px) {
                 .filter-grid {
@@ -708,6 +834,91 @@
                 .filter-grid-2 {
                     grid-template-columns: 1fr 1fr;
                     gap: 0.5rem;
+                }
+
+                /* Mobile select improvements */
+                select {
+                    min-height: 48px !important;
+                    /* Tăng chiều cao cho mobile */
+                    font-size: 16px !important;
+                    /* Ngăn zoom */
+                    padding: 0.75rem 2.5rem 0.75rem 0.75rem !important;
+                }
+
+                input[type="text"],
+                input[type="search"],
+                input[type="date"] {
+                    min-height: 48px !important;
+                    font-size: 16px !important;
+                    padding: 0.75rem !important;
+                }
+            }
+
+            /* iOS PWA Form Element Fixes */
+            .pwa-mode select,
+            .pwa-mode input[type="text"],
+            .pwa-mode input[type="search"],
+            .pwa-mode input[type="date"] {
+                -webkit-appearance: none !important;
+                appearance: none !important;
+                border-radius: 0.5rem !important;
+                min-height: 44px !important;
+                font-size: 16px !important;
+                background-color: #374151 !important;
+                border: 1px solid #4b5563 !important;
+                color: #e5e7eb !important;
+                padding: 0.75rem !important;
+                box-sizing: border-box !important;
+            }
+
+            .pwa-mode select {
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+                background-repeat: no-repeat !important;
+                background-position: right 0.75rem center !important;
+                background-size: 1rem !important;
+                padding-right: 2.5rem !important;
+            }
+
+            .pwa-mode select:focus,
+            .pwa-mode input:focus {
+                outline: none !important;
+                box-shadow: 0 0 0 2px #6366f1 !important;
+                border-color: #6366f1 !important;
+            }
+
+            /* Force consistent form element heights across all browsers */
+            * {
+                box-sizing: border-box;
+            }
+
+            input,
+            select,
+            textarea {
+                vertical-align: baseline !important;
+                line-height: 1.5 !important;
+            }
+
+            /* Specific iOS Safari fixes */
+            @media screen and (-webkit-min-device-pixel-ratio: 0) {
+
+                _::-webkit-full-page-media,
+                _:future,
+                :root select {
+                    background-color: #374151 !important;
+                    border: 1px solid #4b5563 !important;
+                    color: #e5e7eb !important;
+                    min-height: 44px !important;
+                    padding: 0.75rem 2.5rem 0.75rem 0.75rem !important;
+                }
+            }
+
+            /* WebKit specific select styling */
+            @media screen and (-webkit-min-device-pixel-ratio: 0) {
+                select {
+                    background: #374151 url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 0.75rem center !important;
+                    background-size: 1rem !important;
+                    -webkit-appearance: none !important;
+                    appearance: none !important;
                 }
             }
         }
@@ -728,7 +939,8 @@
                 <i class="fas fa-spinner fa-spin fa-3x text-indigo-500"></i>
             </div>
 
-            <main id="mainContent" class="p-4 md:p-6 flex-grow hidden mb-20 lg:mb-6 lg:max-w-4xl lg:mx-auto">
+            <main id="mainContent" class="p-4 md:p-6 flex-grow hidden lg:max-w-4xl lg:mx-auto"
+                style="margin-bottom: 170px; margin-top: 70px;">
                 <div id="home-view" class="view">
                     <section class="mb-6 p-6 bg-gray-800 rounded-2xl shadow-lg">
                         <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider">Số dư hiện tại</h2>
@@ -1142,6 +1354,13 @@
         let allCategories = [];
         let allBudgets = {};
         let currentTransactionType = 'expense';
+        let currentTab = 'home';
+        let tabScrollPositions = {
+            home: 0,
+            reports: 0,
+            budget: 0,
+            settings: 0
+        };
 
         // --- DOM ELEMENTS ---
         const loadingEl = document.getElementById('loading');
@@ -1677,18 +1896,47 @@
 
         // --- NAVIGATION ---
         const switchTab = (tabName) => {
+            // Lưu vị trí cuộn của tab hiện tại
+            if (currentTab) {
+                tabScrollPositions[currentTab] = window.pageYOffset || document.documentElement.scrollTop;
+            }
+
+            // Ẩn tất cả views
             Object.values(views).forEach(view => view.classList.add('hidden'));
             if (views[tabName]) {
                 views[tabName].classList.remove('hidden');
             }
 
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Cập nhật active state cho tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                // Đảm bảo reset về màu mặc định
+                btn.style.color = '';
+            });
             const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
-            if (activeBtn) activeBtn.classList.add('active');
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                // Force active color
+                activeBtn.style.color = '#818cf8';
+            }
 
+            // Cập nhật title
             const titles = { home: 'Trang chủ', reports: 'Báo cáo', budget: 'Ngân sách', settings: 'Cài đặt' };
             headerTitleEl.textContent = titles[tabName] || 'Trang chủ';
 
+            // Cập nhật currentTab
+            currentTab = tabName;
+
+            // Khôi phục vị trí cuộn cho tab mới
+            setTimeout(() => {
+                const savedPosition = tabScrollPositions[tabName] || 0;
+                window.scrollTo({
+                    top: savedPosition,
+                    behavior: 'smooth'
+                });
+            }, 50); // Delay nhỏ để đảm bảo DOM đã render
+
+            // Render data cho các tab cần thiết
             if (tabName === 'budget') renderBudgetView();
             if (tabName === 'reports') processAndRenderData();
         };
@@ -2457,6 +2705,18 @@
                     }
                 });
             });
+
+            // Lưu vị trí cuộn khi người dùng cuộn
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                // Debounce để tối ưu performance
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if (currentTab) {
+                        tabScrollPositions[currentTab] = window.pageYOffset || document.documentElement.scrollTop;
+                    }
+                }, 100);
+            }, { passive: true });
         }
 
         // --- FILTERS ---
@@ -2722,6 +2982,7 @@
 
             loadingEl.classList.add('hidden');
             mainContentEl.classList.remove('hidden');
+            currentTab = 'home'; // Khởi tạo tab hiện tại
             switchTab('home');
 
             // Preload animations cho performance
