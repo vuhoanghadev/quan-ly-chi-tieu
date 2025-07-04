@@ -4,7 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Chi Tiêu Cá Nhân (Nâng cao)</title>
+    <title>Quản Lý Chi Tiêu Cá Nhân</title>
+
+    <!-- Favicon cho tất cả trình duyệt và thiết bị -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="32x32" href="image/logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="image/logo.png">
+
+    <!-- Apple Touch Icon cho iOS -->
+    <link rel="apple-touch-icon" sizes="180x180" href="image/logo.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="image/logo.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="image/logo.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="image/logo.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="image/logo.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="image/logo.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="image/logo.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="image/logo.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="image/logo.png">
+
+    <!-- Android Chrome -->
+    <link rel="icon" type="image/png" sizes="192x192" href="image/logo.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="image/logo.png">
+
+    <!-- Windows Metro -->
+    <meta name="msapplication-TileImage" content="image/logo.png">
+    <meta name="msapplication-TileColor" content="#1f2937">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1f2937">
+    <meta name="application-name" content="Quản Lý Chi Tiêu">
+    <meta name="apple-mobile-web-app-title" content="Chi Tiêu">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Ứng dụng quản lý chi tiêu cá nhân đơn giản và hiệu quả">
+    <meta name="keywords" content="quản lý chi tiêu, tài chính cá nhân, ngân sách, thu chi">
+    <meta name="author" content="Quản Lý Chi Tiêu App">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
@@ -205,11 +245,12 @@
             border: 2px solid #374151;
             border-top: 2px solid #6366f1;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             animation: spin 1s linear infinite;
             display: inline-block;
             margin-right: 8px;
+            vertical-align: middle;
         }
 
         @keyframes spin {
@@ -220,6 +261,26 @@
             100% {
                 transform: rotate(360deg);
             }
+        }
+
+        /* Loading state alignment */
+        #btn-loading,
+        .delete-btn-loading,
+        #confirmOkLoading {
+            align-items: center;
+            justify-content: center;
+        }
+
+        #btn-loading:not(.hidden),
+        .delete-btn-loading:not(.hidden),
+        #confirmOkLoading:not(.hidden) {
+            display: flex;
+        }
+
+        #btn-loading.hidden,
+        .delete-btn-loading.hidden,
+        #confirmOkLoading.hidden {
+            display: none !important;
         }
 
         /* Better Mobile Touch Targets */
@@ -285,39 +346,9 @@
             }
         }
 
-        /* Pull-to-refresh indicator */
-        .pull-to-refresh {
-            position: absolute;
-            top: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #6366f1;
-            font-size: 24px;
-            transition: all 0.3s ease;
-        }
 
-        .pull-to-refresh.visible {
-            top: 20px;
-        }
 
-        /* Haptic feedback simulation */
-        .haptic-feedback {
-            animation: hapticPulse 0.1s ease-in-out;
-        }
 
-        @keyframes hapticPulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(0.95);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
 
         /* Better focus states for accessibility */
         .focus-visible {
@@ -613,7 +644,8 @@
                             class="w-full p-4 text-white font-bold rounded-lg shadow-md transition-all duration-200 touch-target">
                             <span id="btn-text">Thêm giao dịch</span>
                             <span id="btn-loading" class="hidden">
-                                <span class="spinner"></span>Đang xử lý...
+                                <span class="spinner"></span>
+                                <span>Đang xử lý...</span>
                             </span>
                         </button>
                     </div>
@@ -637,7 +669,8 @@
                         class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium touch-target">
                         <span class="delete-btn-text">Xóa giao dịch</span>
                         <span class="delete-btn-loading hidden">
-                            <span class="spinner"></span>Đang xóa...
+                            <span class="spinner"></span>
+                            <span>Đang xóa...</span>
                         </span>
                     </button>
                 </div>
@@ -678,7 +711,8 @@
                     <button id="confirmOk" class="px-6 py-3 rounded-lg transition-colors font-medium touch-target">
                         <span id="confirmOkText">Xác nhận</span>
                         <span id="confirmOkLoading" class="hidden">
-                            <span class="spinner"></span>Đang xử lý...
+                            <span class="spinner"></span>
+                            <span>Đang xử lý...</span>
                         </span>
                     </button>
                 </div>
@@ -789,8 +823,8 @@
                 };
 
                 toast.innerHTML = `
-                    <div class="flex items-start space-x-3">
-                        <i class="fas ${iconMap[type]} text-lg mt-0.5 flex-shrink-0"></i>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas ${iconMap[type]} text-lg flex-shrink-0"></i>
                         <div class="flex-1">
                             <p class="text-gray-200 text-sm leading-relaxed">${message}</p>
                         </div>
@@ -1075,50 +1109,7 @@
         // --- MOBILE UX ENHANCEMENTS ---
         const MobileUX = {
             init() {
-                this.setupPullToRefresh();
                 this.setupSwipeGestures();
-                this.setupHapticFeedback();
-            },
-
-            setupPullToRefresh() {
-                let startY = 0;
-                let currentY = 0;
-                let isPulling = false;
-                const threshold = 80;
-
-                const mainContent = document.getElementById('mainContent');
-
-                mainContent.addEventListener('touchstart', (e) => {
-                    if (mainContent.scrollTop === 0) {
-                        startY = e.touches[0].clientY;
-                        isPulling = true;
-                    }
-                }, { passive: true });
-
-                mainContent.addEventListener('touchmove', (e) => {
-                    if (!isPulling) return;
-
-                    currentY = e.touches[0].clientY;
-                    const pullDistance = currentY - startY;
-
-                    if (pullDistance > 0 && pullDistance < threshold * 2) {
-                        e.preventDefault();
-                        // Visual feedback could be added here
-                    }
-                }, { passive: false });
-
-                mainContent.addEventListener('touchend', () => {
-                    if (!isPulling) return;
-
-                    const pullDistance = currentY - startY;
-                    if (pullDistance > threshold) {
-                        this.triggerRefresh();
-                    }
-
-                    isPulling = false;
-                    startY = 0;
-                    currentY = 0;
-                }, { passive: true });
             },
 
             setupSwipeGestures() {
@@ -1147,27 +1138,6 @@
                         }
                     }
                 }, { passive: true });
-            },
-
-            setupHapticFeedback() {
-                // Add haptic feedback to buttons
-                document.addEventListener('click', (e) => {
-                    const button = e.target.closest('button');
-                    if (button && 'vibrate' in navigator) {
-                        // Light haptic feedback
-                        navigator.vibrate(10);
-                    }
-                });
-            },
-
-            triggerRefresh() {
-                Toast.info('Đang làm mới dữ liệu...');
-
-                // Simulate refresh
-                setTimeout(() => {
-                    processAndRenderData();
-                    Toast.success('Dữ liệu đã được làm mới');
-                }, 1000);
             },
 
             addHapticFeedback(element) {
@@ -1448,11 +1418,6 @@
             `;
 
             containerEl.prepend(item);
-
-            // Add haptic feedback simulation for mobile
-            if (isNew && 'vibrate' in navigator) {
-                navigator.vibrate(50);
-            }
         }
 
         function updateHomeDashboard(transactions) {
@@ -1883,7 +1848,7 @@
 
                 // Show loading state
                 const originalText = exportCsvBtn.innerHTML;
-                exportCsvBtn.innerHTML = '<span class="spinner"></span>Đang xuất dữ liệu...';
+                exportCsvBtn.innerHTML = '<span style="display: flex; align-items: center; justify-content: center;"><span class="spinner"></span><span>Đang xuất dữ liệu...</span></span>';
                 exportCsvBtn.disabled = true;
 
                 try {

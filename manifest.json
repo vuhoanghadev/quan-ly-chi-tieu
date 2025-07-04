@@ -1,0 +1,66 @@
+{
+  "name": "Quản Lý Chi Tiêu Cá Nhân",
+  "short_name": "Chi Tiêu",
+  "description": "Ứng dụng quản lý chi tiêu cá nhân đơn giản và hiệu quả",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "image/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "productivity", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Thêm giao dịch mới",
+      "short_name": "Thêm",
+      "description": "Thêm giao dịch thu chi mới",
+      "url": "/?action=add",
+      "icons": [
+        {
+          "src": "image/logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
