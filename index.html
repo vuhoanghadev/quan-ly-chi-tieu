@@ -426,6 +426,11 @@
         .loading-overlay.hidden {
             display: none;
         }
+
+        /* Custom margin-bottom cho mainContent */
+        #mainContent.mb-20 {
+            margin-bottom: 12rem;
+        }
     </style>
 </head>
 
@@ -560,11 +565,47 @@
                                     class="fas fa-plus"></i></button>
                         </form>
                     </section>
-                    <section class="p-4 bg-gray-800 rounded-2xl shadow-lg">
+                    <section class="mb-6 p-4 bg-gray-800 rounded-2xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4">Quản lý dữ liệu</h3>
                         <button id="export-csv"
                             class="w-full p-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors"><i
                                 class="fas fa-file-csv mr-2"></i> Xuất dữ liệu ra CSV</button>
+                    </section>
+
+                    <section
+                        class="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-lg border border-gray-700">
+                        <div class="text-center">
+                            <div
+                                class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-code text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Phát triển bởi</h3>
+                            <p class="text-xl font-bold text-indigo-400 mb-1">Vũ Hoàng Hà</p>
+                            <p class="text-sm text-gray-400 mb-4">Full-stack Developer</p>
+
+                            <div class="flex justify-center space-x-4 mb-4">
+                                <a href="https://facebook.com/vuhoangha.dev" target="_blank" rel="noopener noreferrer"
+                                    class="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-white text-sm font-medium">
+                                    <i class="fab fa-facebook-f"></i>
+                                    <span>Facebook</span>
+                                </a>
+                                <button onclick="copyContact()"
+                                    class="flex items-center space-x-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-white text-sm font-medium">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Liên hệ</span>
+                                </button>
+                            </div>
+
+                            <div class="border-t border-gray-700 pt-4">
+                                <p class="text-xs text-gray-500 leading-relaxed">
+                                    <i class="fas fa-heart text-red-500 mr-1"></i>
+                                    Được phát triển với tình yêu và đam mê công nghệ
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    © 2025 Vũ Hoàng Hà. All rights reserved.
+                                </p>
+                            </div>
+                        </div>
                     </section>
                 </div>
             </main>
@@ -2090,6 +2131,41 @@
                     Toast.info('Chào mừng! Nhấn nút + để thêm giao dịch đầu tiên của bạn', 6000);
                 }, 1000);
             }
+        }
+
+        // --- COPY CONTACT FUNCTION ---
+        function copyContact() {
+            const contactInfo = "Facebook: vuhoangha.dev\nDeveloper: Vũ Hoàng Hà";
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(contactInfo).then(() => {
+                    Toast.success('Đã copy thông tin liên hệ vào clipboard!');
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(contactInfo);
+                });
+            } else {
+                fallbackCopyTextToClipboard(contactInfo);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                Toast.success('Đã copy thông tin liên hệ!');
+            } catch (err) {
+                Toast.error('Không thể copy. Vui lòng copy thủ công.');
+            }
+
+            document.body.removeChild(textArea);
         }
 
         document.addEventListener('DOMContentLoaded', initializeApp);
