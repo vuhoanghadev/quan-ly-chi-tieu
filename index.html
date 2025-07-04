@@ -170,14 +170,194 @@
             width: 100%;
         }
 
+        /* Enhanced Tab Navigation */
+        #tab-nav {
+            background: linear-gradient(180deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.95) 100%);
+            border-image: linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.3)) 1;
+        }
+
+        /* Tab Button Enhanced Styles */
+        .tab-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transform: translateX(-50%);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-btn.active::before {
+            width: 60%;
+        }
+
         /* Active Tab Button */
         .tab-btn.active {
             color: #818cf8 !important;
         }
 
+        .tab-btn.active .tab-icon-container {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2)) !important;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .tab-btn.active .tab-indicator {
+            opacity: 1 !important;
+            transform: translateX(-50%) scale(1.2);
+        }
+
+        .tab-btn.active i {
+            transform: translateY(-1px);
+            text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+        }
+
+        .tab-btn.active span {
+            color: #a5b4fc !important;
+            font-weight: 600;
+        }
+
+        /* Hover Effects */
+        .tab-btn:hover:not(.active) .tab-icon-container {
+            transform: scale(1.02);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .tab-btn:hover:not(.active) i {
+            transform: translateY(-0.5px);
+        }
+
+        /* Ripple Effect */
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .tab-btn:active::after {
+            width: 100px;
+            height: 100px;
+        }
+
         /* Đảm bảo active state luôn có ưu tiên cao nhất */
         .tab-btn.active:hover {
             color: #818cf8 !important;
+        }
+
+        /* Enhanced Header Styles */
+        header {
+            background: linear-gradient(180deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.95) 100%);
+            border-image: linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.3)) 1;
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+        }
+
+        .header-icon-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-icon-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .header-icon-container:hover::before {
+            opacity: 1;
+        }
+
+        .header-icon-container i {
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header-icon-container:hover i {
+            transform: scale(1.1) rotate(5deg);
+            filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+        }
+
+        .header-title-container h1 {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .header-subtitle {
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+
+
+        /* Header Animation on Scroll */
+        .header-scrolled {
+            background: linear-gradient(180deg, rgba(17, 24, 39, 0.98) 0%, rgba(31, 41, 55, 0.98) 100%);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Mobile specific enhancements */
+        @media (max-width: 768px) {
+            .tab-btn {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .tab-icon-container {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+
+            .tab-btn.active .tab-icon-container {
+                box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+            }
+
+            header {
+                padding: 1rem;
+            }
+
+            .header-icon-container {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+
+            .header-title-container h1 {
+                font-size: 1.125rem;
+            }
+
+            .header-subtitle {
+                font-size: 0.75rem;
+            }
         }
 
         /* Date Picker Icon Color */
@@ -383,7 +563,7 @@
 
             /* Enhanced numeric input for mobile */
             input[inputmode="numeric"] {
-                font-size: 18px !important;
+                font-size: 16px !important;
                 /* Larger font for better readability */
                 letter-spacing: 0.5px;
                 /* Better spacing for numbers */
@@ -549,11 +729,24 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9998;
+        }
+
+        .loading-overlay .loading-content {
+            background: rgba(31, 41, 55, 0.95);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 16px;
+            padding: 32px 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .loading-overlay.hidden {
@@ -784,6 +977,20 @@
                 pointer-events: none;
             }
 
+            /* Search input placeholder positioning */
+            #search-input::placeholder {
+                padding-left: 0.5rem;
+                color: #9ca3af;
+            }
+
+            /* Form input placeholder đồng nhất */
+            #description::placeholder,
+            #amount::placeholder {
+                font-size: 16px !important;
+                color: #9ca3af;
+                font-weight: 400;
+            }
+
             /* iOS Select Fix */
             select {
                 -webkit-appearance: none;
@@ -944,8 +1151,20 @@
     <div id="app" class="w-full min-h-screen bg-gray-900 flex flex-col relative">
 
         <header
-            class="bg-gray-800/80 backdrop-blur-sm text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-20 border-b border-gray-700 lg:hidden">
-            <h1 id="header-title" class="text-xl font-bold">Trang chủ</h1>
+            class="bg-gray-900/95 backdrop-blur-lg text-white p-4 shadow-2xl flex justify-between items-center sticky top-0 z-20 border-b border-gray-600/50 lg:hidden">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="header-icon-container w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30">
+                    <i id="header-icon" class="fas fa-home text-indigo-400 text-lg"></i>
+                </div>
+                <div class="header-title-container">
+                    <h1 id="header-title"
+                        class="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                        Trang chủ</h1>
+                    <div class="header-subtitle text-xs text-gray-400 font-medium">Quản lý chi tiêu thông minh</div>
+                </div>
+            </div>
+
         </header>
 
         <div class="flex-1 lg:pl-24">
@@ -1000,11 +1219,11 @@
                         <!-- Tìm kiếm nâng cao -->
                         <div class="mb-4">
                             <div class="relative">
-                                <input type="search" id="search-input"
-                                    placeholder="Tìm theo mô tả, số tiền hoặc danh mục..."
-                                    class="w-full p-3 pl-10 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                                <input type="search" id="search-input" placeholder="Tìm theo số tiền hoặc danh mục..."
+                                    class="w-full p-3 pl-14 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    style="padding-left: 40px;">
                                 <i
-                                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             </div>
                         </div>
 
@@ -1095,7 +1314,7 @@
                             <span id="results-count">0</span> kết quả được tìm thấy
                         </div>
                     </section>
-                    <section class="mb-6 p-4 bg-gray-800 rounded-2xl shadow-lg">
+                    <section id="report-statistics-section" class="mb-6 p-4 bg-gray-800 rounded-2xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4">Thống kê giai đoạn</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                             <div class="p-3 bg-gray-700 rounded-lg">
@@ -1199,26 +1418,62 @@
         </div>
 
         <nav id="tab-nav"
-            class="fixed bottom-0 w-full bg-gray-800/80 backdrop-blur-sm border-t border-gray-700 flex justify-around z-30 lg:left-0 lg:top-0 lg:h-screen lg:w-24 lg:flex-col lg:justify-start lg:border-t-0 lg:border-r lg:pt-8 lg:gap-4">
+            class="fixed bottom-0 w-full bg-gray-900/95 backdrop-blur-lg border-t border-gray-600/50 flex justify-around z-30 lg:left-0 lg:top-0 lg:h-screen lg:w-24 lg:flex-col lg:justify-start lg:border-t-0 lg:border-r lg:pt-8 lg:gap-4 shadow-2xl">
             <button data-tab="home"
-                class="tab-btn flex-1 p-4 text-center text-gray-400 transition-colors hover:text-indigo-400 lg:flex-none lg:w-full lg:py-4 touch-target">
-                <i class="fas fa-home text-2xl"></i>
-                <span class="text-xs block mt-1 lg:mt-2 lg:text-sm">Trang chủ</span>
+                class="tab-btn relative flex-1 p-3 text-center text-gray-400 transition-all duration-300 hover:text-indigo-400 lg:flex-none lg:w-full lg:py-4 touch-target group">
+                <div class="relative flex flex-col items-center">
+                    <div
+                        class="tab-icon-container relative w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 group-hover:bg-indigo-500/20">
+                        <i class="fas fa-home text-xl transition-all duration-300"></i>
+                        <div
+                            class="tab-indicator absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all duration-300">
+                        </div>
+                    </div>
+                    <span class="text-xs block mt-1 lg:mt-2 lg:text-sm font-medium transition-all duration-300">Trang
+                        chủ</span>
+                </div>
             </button>
             <button data-tab="reports"
-                class="tab-btn flex-1 p-4 text-center text-gray-400 transition-colors hover:text-indigo-400 lg:flex-none lg:w-full lg:py-4 touch-target">
-                <i class="fas fa-chart-pie text-2xl"></i>
-                <span class="text-xs block mt-1 lg:mt-2 lg:text-sm">Báo cáo</span>
+                class="tab-btn relative flex-1 p-3 text-center text-gray-400 transition-all duration-300 hover:text-indigo-400 lg:flex-none lg:w-full lg:py-4 touch-target group">
+                <div class="relative flex flex-col items-center">
+                    <div
+                        class="tab-icon-container relative w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 group-hover:bg-indigo-500/20">
+                        <i class="fas fa-chart-pie text-xl transition-all duration-300"></i>
+                        <div
+                            class="tab-indicator absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all duration-300">
+                        </div>
+                    </div>
+                    <span class="text-xs block mt-1 lg:mt-2 lg:text-sm font-medium transition-all duration-300">Báo
+                        cáo</span>
+                </div>
             </button>
             <button data-tab="budget"
-                class="tab-btn flex-1 p-4 text-center text-gray-400 transition-colors hover:text-indigo-400 lg:flex-none lg:w-full lg:py-4 touch-target">
-                <i class="fas fa-piggy-bank text-2xl"></i>
-                <span class="text-xs block mt-1 lg:mt-2 lg:text-sm">Ngân sách</span>
+                class="tab-btn relative flex-1 p-3 text-center text-gray-400 transition-all duration-300 hover:text-indigo-400 lg:flex-none lg:w-full lg:py-4 touch-target group">
+                <div class="relative flex flex-col items-center">
+                    <div
+                        class="tab-icon-container relative w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 group-hover:bg-indigo-500/20">
+                        <i class="fas fa-piggy-bank text-xl transition-all duration-300"></i>
+                        <div
+                            class="tab-indicator absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all duration-300">
+                        </div>
+                    </div>
+                    <span class="text-xs block mt-1 lg:mt-2 lg:text-sm font-medium transition-all duration-300">Ngân
+                        sách</span>
+                </div>
             </button>
             <button data-tab="settings"
-                class="tab-btn flex-1 p-4 text-center text-gray-400 transition-colors hover:text-indigo-400 lg:flex-none lg:w-full lg:py-4 touch-target">
-                <i class="fas fa-cog text-2xl"></i>
-                <span class="text-xs block mt-1 lg:mt-2 lg:text-sm">Cài đặt</span>
+                class="tab-btn relative flex-1 p-3 text-center text-gray-400 transition-all duration-300 hover:text-indigo-400 lg:flex-none lg:w-full lg:py-4 touch-target group">
+                <div class="relative flex flex-col items-center">
+                    <div
+                        class="tab-icon-container relative w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 group-hover:bg-indigo-500/20">
+                        <i class="fas fa-cog text-xl transition-all duration-300"></i>
+                        <div
+                            class="tab-indicator absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full opacity-0 transition-all duration-300">
+                        </div>
+                    </div>
+                    <span class="text-xs block mt-1 lg:mt-2 lg:text-sm font-medium transition-all duration-300">Cài
+                        đặt</span>
+                </div>
             </button>
         </nav>
 
@@ -1249,17 +1504,17 @@
                             nhập</button>
                     </div>
                     <div>
-                        <input type="text" id="description" placeholder="Mô tả (vd: Ăn tối cùng bạn bè)"
-                            class="w-full p-3 bg-gray-700 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 touch-target"
+                        <input type="text" id="description" placeholder="VD: Ăn tối cùng bạn bè"
+                            class="w-full p-3 bg-gray-700 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 touch-target text-base"
                             maxlength="200">
                         <div id="description-error" class="error-message">Mô tả không được để trống và tối đa 200 ký tự
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <input type="text" id="amount" placeholder="Số tiền (VD: 100.000)" inputmode="numeric"
+                            <input type="text" id="amount" placeholder="VD: 100.000" inputmode="numeric"
                                 pattern="[0-9]*"
-                                class="p-3 bg-gray-700 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 touch-target w-full">
+                                class="p-3 bg-gray-700 text-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 touch-target w-full text-base">
                             <div id="amount-error" class="error-message">Số tiền phải từ 1₫ trở lên</div>
                         </div>
                         <div>
@@ -1350,9 +1605,9 @@
 
         <!-- Loading Overlay -->
         <div id="loadingOverlay" class="loading-overlay hidden">
-            <div class="text-center">
+            <div class="loading-content">
                 <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto 16px;"></div>
-                <p class="text-white text-lg">Đang xử lý...</p>
+                <p class="text-white text-lg font-medium">Đang xử lý...</p>
             </div>
         </div>
 
@@ -1434,6 +1689,9 @@
         const budgetListEl = document.getElementById('budget-list');
         const budgetEmptyStateEl = document.getElementById('budget-empty-state');
         const budgetMonthEl = document.getElementById('budget-month');
+
+        // Report statistics elements
+        const reportStatisticsSection = document.getElementById('report-statistics-section');
         const categoryListEl = document.getElementById('category-list');
         const addCategoryForm = document.getElementById('add-category-form');
         const newCategoryNameInput = document.getElementById('new-category-name');
@@ -1937,9 +2195,42 @@
                 activeBtn.style.color = '#818cf8';
             }
 
-            // Cập nhật title
-            const titles = { home: 'Trang chủ', reports: 'Báo cáo', budget: 'Ngân sách', settings: 'Cài đặt' };
-            headerTitleEl.textContent = titles[tabName] || 'Trang chủ';
+            // Cập nhật title, icon và subtitle
+            const tabInfo = {
+                home: {
+                    title: 'Trang chủ',
+                    icon: 'fas fa-home',
+                    subtitle: 'Tổng quan tài chính'
+                },
+                reports: {
+                    title: 'Báo cáo',
+                    icon: 'fas fa-chart-pie',
+                    subtitle: 'Phân tích chi tiêu'
+                },
+                budget: {
+                    title: 'Ngân sách',
+                    icon: 'fas fa-piggy-bank',
+                    subtitle: 'Quản lý ngân sách'
+                },
+                settings: {
+                    title: 'Cài đặt',
+                    icon: 'fas fa-cog',
+                    subtitle: 'Tùy chỉnh ứng dụng'
+                }
+            };
+
+            const currentTabInfo = tabInfo[tabName] || tabInfo.home;
+            headerTitleEl.textContent = currentTabInfo.title;
+
+            // Cập nhật icon header
+            const headerIcon = document.getElementById('header-icon');
+            const headerSubtitle = document.querySelector('.header-subtitle');
+            if (headerIcon) {
+                headerIcon.className = `${currentTabInfo.icon} text-indigo-400 text-lg`;
+            }
+            if (headerSubtitle) {
+                headerSubtitle.textContent = currentTabInfo.subtitle;
+            }
 
             // Cập nhật currentTab
             currentTab = tabName;
@@ -1997,8 +2288,7 @@
             customDateFilters.classList.add('hidden');
             advancedFilters.classList.add('hidden');
             advancedFilterToggle.innerHTML = '<i class="fas fa-filter mr-1"></i>Nâng cao';
-            processAndRenderData();
-            Toast.info('Đã xóa tất cả bộ lọc');
+            processAndRenderDataWithLoading(true, 'Đã xóa tất cả bộ lọc');
         }
 
         function showEditCategoryModal(oldName) {
@@ -2147,6 +2437,66 @@
             updateChart(allTransactions);
             updateReportSummary(filteredTransactions);
             updateFilterResults(filteredTransactions.length);
+        }
+
+        // Function tính toán header height động
+        function getHeaderHeight() {
+            const header = document.querySelector('header');
+            if (!header) return 0;
+
+            const headerRect = header.getBoundingClientRect();
+            const headerHeight = headerRect.height;
+
+            // Thêm safe area top nếu có
+            const safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top')) || 0;
+
+            return headerHeight + safeAreaTop;
+        }
+
+        // Function xử lý loading và cuộn cho báo cáo
+        async function processAndRenderDataWithLoading(showSuccessToast = false, toastMessage = '') {
+            // Chỉ thực hiện loading và cuộn nếu đang ở tab báo cáo
+            const currentTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+            if (currentTab !== 'reports') {
+                processAndRenderData();
+                if (showSuccessToast && toastMessage) {
+                    Toast.info(toastMessage);
+                }
+                return;
+            }
+
+            // Hiển thị loading overlay ở giữa màn hình
+            LoadingState.showOverlay('Đang tính toán thống kê...');
+
+            // Loading trong 0.8s
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // Xử lý dữ liệu
+            processAndRenderData();
+
+            // Ẩn loading overlay
+            LoadingState.hideOverlay();
+
+            // Hiển thị thông báo sau khi loading xong (nếu có)
+            if (showSuccessToast && toastMessage) {
+                Toast.info(toastMessage);
+            }
+
+            // Tự động cuộn xuống phần thống kê giai đoạn với offset chính xác
+            setTimeout(() => {
+                const headerHeight = getHeaderHeight();
+                const sectionRect = reportStatisticsSection.getBoundingClientRect();
+                const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+                // Tính toán vị trí cuộn với offset nhỏ hơn 1.5rem (24px)
+                const offsetAdjustment = 24; // 1.5rem = 24px
+                const targetScrollY = currentScrollY + sectionRect.top - headerHeight - offsetAdjustment;
+
+                window.scrollTo({
+                    top: targetScrollY,
+                    behavior: 'smooth'
+                });
+            }, 100);
         }
 
         function updateFilterResults(count) {
@@ -2452,6 +2802,18 @@
 
                         const typeText = currentTransactionType === 'expense' ? 'chi tiêu' : 'thu nhập';
                         Toast.success(`Đã thêm ${typeText} ${formatCurrency(amount)} thành công!`);
+
+                        // Tự động chuyển về tab Trang chủ và cuộn lên đầu trang
+                        setTimeout(() => {
+                            switchTab('home');
+                            // Cuộn lên đầu trang
+                            setTimeout(() => {
+                                window.scrollTo({
+                                    top: 0,
+                                    behavior: 'smooth'
+                                });
+                            }, 100);
+                        }, 300);
                     }
 
                     Storage.set(TRANSACTIONS_KEY, allTransactions);
@@ -2634,7 +2996,16 @@
                 }
             });
 
-            dateRangeFilter.addEventListener('change', () => { if (dateRangeFilter.value === 'custom') { customDateFilters.classList.remove('hidden'); } else { customDateFilters.classList.add('hidden'); startDateInput.value = ''; endDateInput.value = ''; processAndRenderData(); } });
+            dateRangeFilter.addEventListener('change', () => {
+                if (dateRangeFilter.value === 'custom') {
+                    customDateFilters.classList.remove('hidden');
+                } else {
+                    customDateFilters.classList.add('hidden');
+                    startDateInput.value = '';
+                    endDateInput.value = '';
+                    processAndRenderDataWithLoading();
+                }
+            });
 
             exportCsvBtn.addEventListener('click', async () => {
                 if (allTransactions.length === 0) {
@@ -2682,19 +3053,19 @@
                 }
             });
 
-            // Filter event listeners
+            // Filter event listeners với loading và cuộn
             [searchInput, startDateInput, endDateInput, minAmountInput, maxAmountInput].forEach(el => {
                 el.addEventListener('input', () => {
                     if (document.activeElement === startDateInput || document.activeElement === endDateInput) {
                         dateRangeFilter.value = 'custom';
                         customDateFilters.classList.remove('hidden');
                     }
-                    processAndRenderData();
+                    processAndRenderDataWithLoading();
                 });
             });
 
             [typeFilter, categoryFilter, sortFilter].forEach(el => {
-                el.addEventListener('change', processAndRenderData);
+                el.addEventListener('change', processAndRenderDataWithLoading);
             });
 
             // Clear filters button
