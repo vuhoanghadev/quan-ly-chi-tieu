@@ -921,139 +921,6 @@
                     appearance: none !important;
                 }
             }
-
-            /* Tab Navigation Fixes for Mobile */
-            #tab-nav {
-                /* Đảm bảo z-index cao nhất */
-                z-index: 9999 !important;
-
-                /* Đảm bảo pointer events hoạt động */
-                pointer-events: auto !important;
-
-                /* Solid background thay vì transparent để tránh xung đột */
-                background-color: rgba(31, 41, 55, 0.95) !important;
-
-                /* Tối ưu rendering */
-                transform: translateZ(0);
-                -webkit-transform: translateZ(0);
-                will-change: transform;
-
-                /* Đảm bảo không bị ảnh hưởng bởi scroll */
-                position: fixed !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-            }
-
-            /* Tab buttons optimization */
-            .tab-btn {
-                /* Đảm bảo touch events hoạt động */
-                pointer-events: auto !important;
-                touch-action: manipulation !important;
-
-                /* Tối ưu rendering */
-                transform: translateZ(0);
-                -webkit-transform: translateZ(0);
-
-                /* Đảm bảo không bị overlap */
-                position: relative !important;
-                z-index: 1 !important;
-
-                /* Đảm bảo touch target đủ lớn */
-                min-height: 60px !important;
-
-                /* Tắt user-select để tránh xung đột */
-                -webkit-user-select: none !important;
-                -moz-user-select: none !important;
-                user-select: none !important;
-            }
-
-            /* Mobile specific tab nav fixes */
-            @media (max-width: 1024px) {
-                #tab-nav {
-                    /* Tăng độ đậm background trên mobile */
-                    background-color: rgba(31, 41, 55, 1) !important;
-                    backdrop-filter: none !important;
-                    -webkit-backdrop-filter: none !important;
-
-                    /* Đảm bảo border rõ ràng */
-                    border-top: 1px solid #374151 !important;
-
-                    /* Tối ưu performance */
-                    contain: layout style paint !important;
-                }
-
-                .tab-btn {
-                    /* Tăng touch target trên mobile */
-                    min-height: 70px !important;
-                    padding: 1rem !important;
-
-                    /* Đảm bảo text không bị select */
-                    -webkit-touch-callout: none !important;
-                    -webkit-tap-highlight-color: transparent !important;
-                }
-            }
-
-            /* iOS specific fixes */
-            @supports (-webkit-touch-callout: none) {
-                #tab-nav {
-                    /* Tắt backdrop-filter trên iOS để tránh bug */
-                    backdrop-filter: none !important;
-                    -webkit-backdrop-filter: none !important;
-                    background-color: #1f2937 !important;
-
-                    /* Đảm bảo safe area */
-                    padding-bottom: env(safe-area-inset-bottom, 0) !important;
-                }
-
-                .tab-btn {
-                    /* Tối ưu touch trên iOS */
-                    -webkit-touch-callout: none !important;
-                    -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
-                    -webkit-user-select: none !important;
-                    user-select: none !important;
-                }
-            }
-
-            /* Đảm bảo không có element nào che tab nav */
-            body>* {
-                position: relative;
-                z-index: auto;
-            }
-
-            #tab-nav {
-                z-index: 9999 !important;
-            }
-
-            /* Ngăn chặn scroll interference với tab nav */
-            @media (max-width: 1024px) {
-                body {
-                    padding-bottom: 70px;
-                    /* Đảm bảo content không bị che bởi tab nav */
-                }
-
-                #mainContent {
-                    margin-bottom: 170px !important;
-                    /* Đã có sẵn từ trước */
-                }
-            }
-
-            /* Fix cho các modal không che tab nav */
-            .modal {
-                z-index: 10000 !important;
-            }
-
-            #add-edit-modal,
-            #deleteModal,
-            #editCategoryModal,
-            #customConfirmModal {
-                z-index: 10000 !important;
-            }
-
-            /* Đảm bảo toast không che tab nav */
-            .toast-container {
-                z-index: 9998 !important;
-            }
         }
     </style>
 </head>
@@ -2497,39 +2364,10 @@
 
         // --- EVENT LISTENERS ---
         function setupEventListeners() {
-            // Enhanced tab navigation with mobile optimizations
             tabNav.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
                 const tabButton = e.target.closest('.tab-btn');
-                if (tabButton && !tabButton.disabled) {
-                    // Prevent double-tap issues on mobile
-                    tabButton.disabled = true;
-                    setTimeout(() => {
-                        tabButton.disabled = false;
-                    }, 300);
-
-                    switchTab(tabButton.dataset.tab);
-                }
-            }, { passive: false });
-
-            // Touch events for better mobile responsiveness
-            tabNav.addEventListener('touchstart', (e) => {
-                const tabButton = e.target.closest('.tab-btn');
-                if (tabButton) {
-                    tabButton.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
-                }
-            }, { passive: true });
-
-            tabNav.addEventListener('touchend', (e) => {
-                const tabButton = e.target.closest('.tab-btn');
-                if (tabButton) {
-                    setTimeout(() => {
-                        tabButton.style.backgroundColor = '';
-                    }, 150);
-                }
-            }, { passive: true });
+                if (tabButton) switchTab(tabButton.dataset.tab);
+            });
 
             // ⭐ SỰ KIỆN CHO NÚT TOGGLE ĐÃ ĐƯỢC PHỤC HỒI
             addModeToggle.addEventListener('click', (e) => {
@@ -3193,61 +3031,6 @@
             document.body.removeChild(textArea);
         }
 
-        // --- TAB NAVIGATION STABILITY ---
-        function ensureTabNavStability() {
-            const tabNav = document.getElementById('tab-nav');
-            if (!tabNav) return;
-
-            // Đảm bảo tab nav luôn ở vị trí đúng
-            const fixTabNavPosition = () => {
-                tabNav.style.position = 'fixed';
-                tabNav.style.bottom = '0';
-                tabNav.style.left = '0';
-                tabNav.style.right = '0';
-                tabNav.style.zIndex = '9999';
-                tabNav.style.pointerEvents = 'auto';
-            };
-
-            // Fix position ngay lập tức
-            fixTabNavPosition();
-
-            // Re-fix khi có scroll hoặc resize
-            let fixTimeout;
-            const scheduleFixPosition = () => {
-                clearTimeout(fixTimeout);
-                fixTimeout = setTimeout(fixTabNavPosition, 100);
-            };
-
-            window.addEventListener('scroll', scheduleFixPosition, { passive: true });
-            window.addEventListener('resize', scheduleFixPosition, { passive: true });
-            window.addEventListener('orientationchange', () => {
-                setTimeout(fixTabNavPosition, 200);
-            });
-
-            // Đảm bảo tab buttons có thể click được
-            const tabButtons = tabNav.querySelectorAll('.tab-btn');
-            tabButtons.forEach(btn => {
-                btn.style.pointerEvents = 'auto';
-                btn.style.touchAction = 'manipulation';
-                btn.style.position = 'relative';
-                btn.style.zIndex = '1';
-            });
-
-            // Debug: Log khi tab nav bị vấn đề
-            const checkTabNavHealth = () => {
-                const computedStyle = window.getComputedStyle(tabNav);
-                if (computedStyle.pointerEvents === 'none' ||
-                    computedStyle.zIndex < 9999 ||
-                    computedStyle.position !== 'fixed') {
-                    console.warn('Tab nav health issue detected, fixing...');
-                    fixTabNavPosition();
-                }
-            };
-
-            // Check health định kỳ
-            setInterval(checkTabNavHealth, 5000);
-        }
-
         // --- PWA SAFE AREA HANDLER ---
         function handlePWASafeArea() {
             // Phát hiện PWA mode
@@ -3311,7 +3094,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            ensureTabNavStability();
             handlePWASafeArea();
             preventHeaderOverscroll();
             initializeApp();
