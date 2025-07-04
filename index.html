@@ -645,6 +645,71 @@
             .pwa-mode #loading {
                 margin-top: calc(4rem + max(env(safe-area-inset-top), 2.5rem)) !important;
             }
+
+            /* Enhanced Filter Styles */
+            #advanced-filters {
+                transition: all 0.3s ease-in-out;
+                max-height: 0;
+                overflow: hidden;
+            }
+
+            #advanced-filters:not(.hidden) {
+                max-height: 500px;
+            }
+
+            #filter-results {
+                animation: fadeIn 0.3s ease-in-out;
+            }
+
+            .filter-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.25rem 0.5rem;
+                background: rgba(99, 102, 241, 0.2);
+                border: 1px solid rgba(99, 102, 241, 0.3);
+                border-radius: 0.5rem;
+                font-size: 0.75rem;
+                color: #a5b4fc;
+                margin: 0.125rem;
+            }
+
+            .filter-badge .remove-filter {
+                margin-left: 0.25rem;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+
+            .filter-badge .remove-filter:hover {
+                opacity: 1;
+            }
+
+            /* Search input with icon */
+            .search-container {
+                position: relative;
+            }
+
+            .search-container .search-icon {
+                position: absolute;
+                left: 0.75rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #9ca3af;
+                pointer-events: none;
+            }
+
+            /* Improved mobile filter layout */
+            @media (max-width: 640px) {
+                .filter-grid {
+                    grid-template-columns: 1fr;
+                    gap: 0.75rem;
+                }
+
+                .filter-grid-2 {
+                    grid-template-columns: 1fr 1fr;
+                    gap: 0.5rem;
+                }
+            }
         }
     </style>
 </head>
@@ -698,29 +763,108 @@
 
                 <div id="reports-view" class="view hidden">
                     <section class="mb-6 p-4 bg-gray-800 rounded-2xl shadow-lg">
-                        <h3 class="text-lg font-semibold mb-4">Bộ lọc & Tìm kiếm</h3>
-                        <input type="search" id="search-input" placeholder="Tìm theo mô tả..."
-                            class="w-full mb-4 p-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
-                        <select id="date-range-filter"
-                            class="w-full mb-4 p-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
-                            <option value="all">Toàn bộ thời gian</option>
-                            <option value="today">Hôm nay</option>
-                            <option value="this_week">Tuần này</option>
-                            <option value="this_month">Tháng này</option>
-                            <option value="this_year">Năm nay</option>
-                            <option value="custom">Tùy chỉnh...</option>
-                        </select>
-                        <div id="custom-date-filters" class="grid grid-cols-2 gap-4 hidden">
-                            <div>
-                                <label for="startDate" class="text-sm font-medium text-gray-300">Từ ngày</label>
-                                <input type="date" id="startDate"
-                                    class="w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">Bộ lọc & Tìm kiếm</h3>
+                            <button id="clear-filters-btn"
+                                class="px-3 py-1 text-sm bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors text-gray-300 hover:text-white">
+                                <i class="fas fa-times mr-1"></i>Xóa bộ lọc
+                            </button>
+                        </div>
+
+                        <!-- Tìm kiếm nâng cao -->
+                        <div class="mb-4">
+                            <div class="relative">
+                                <input type="search" id="search-input"
+                                    placeholder="Tìm theo mô tả, số tiền hoặc danh mục..."
+                                    class="w-full p-3 pl-10 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                                <i
+                                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             </div>
+                        </div>
+
+                        <!-- Bộ lọc nhanh -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                            <select id="type-filter"
+                                class="p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm">
+                                <option value="all">Tất cả loại</option>
+                                <option value="income">Thu nhập</option>
+                                <option value="expense">Chi tiêu</option>
+                            </select>
+
+                            <select id="category-filter"
+                                class="p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm">
+                                <option value="all">Tất cả danh mục</option>
+                            </select>
+
+                            <select id="sort-filter"
+                                class="p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm">
+                                <option value="date_desc">Mới nhất</option>
+                                <option value="date_asc">Cũ nhất</option>
+                                <option value="amount_desc">Số tiền cao</option>
+                                <option value="amount_asc">Số tiền thấp</option>
+                                <option value="name_asc">Tên A-Z</option>
+                                <option value="name_desc">Tên Z-A</option>
+                            </select>
+
+                            <button id="advanced-filter-toggle"
+                                class="p-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors text-white text-sm">
+                                <i class="fas fa-filter mr-1"></i>Nâng cao
+                            </button>
+                        </div>
+
+                        <!-- Bộ lọc nâng cao -->
+                        <div id="advanced-filters" class="hidden space-y-4 p-4 bg-gray-700/50 rounded-lg">
+                            <!-- Khoảng thời gian -->
                             <div>
-                                <label for="endDate" class="text-sm font-medium text-gray-300">Đến ngày</label>
-                                <input type="date" id="endDate"
-                                    class="w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200">
+                                <label class="text-sm font-medium text-gray-300 mb-2 block">Khoảng thời gian</label>
+                                <select id="date-range-filter"
+                                    class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm">
+                                    <option value="all">Toàn bộ thời gian</option>
+                                    <option value="today">Hôm nay</option>
+                                    <option value="yesterday">Hôm qua</option>
+                                    <option value="this_week">Tuần này</option>
+                                    <option value="last_week">Tuần trước</option>
+                                    <option value="this_month">Tháng này</option>
+                                    <option value="last_month">Tháng trước</option>
+                                    <option value="this_year">Năm nay</option>
+                                    <option value="last_year">Năm trước</option>
+                                    <option value="custom">Tùy chỉnh...</option>
+                                </select>
                             </div>
+
+                            <div id="custom-date-filters" class="grid grid-cols-2 gap-4 hidden">
+                                <div>
+                                    <label for="startDate" class="text-sm font-medium text-gray-300">Từ ngày</label>
+                                    <input type="date" id="startDate"
+                                        class="w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200">
+                                </div>
+                                <div>
+                                    <label for="endDate" class="text-sm font-medium text-gray-300">Đến ngày</label>
+                                    <input type="date" id="endDate"
+                                        class="w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200">
+                                </div>
+                            </div>
+
+                            <!-- Khoảng số tiền -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-300 mb-2 block">Khoảng số tiền</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <input type="text" id="min-amount" placeholder="Từ (VD: 100.000)"
+                                            class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm">
+                                    </div>
+                                    <div>
+                                        <input type="text" id="max-amount" placeholder="Đến (VD: 1.000.000)"
+                                            class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 text-sm">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hiển thị kết quả -->
+                        <div id="filter-results" class="mt-4 text-sm text-gray-400 hidden">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <span id="results-count">0</span> kết quả được tìm thấy
                         </div>
                     </section>
                     <section class="mb-6 p-4 bg-gray-800 rounded-2xl shadow-lg">
@@ -1039,6 +1183,18 @@
         const reportIncomeEl = document.getElementById('report-income');
         const reportExpenseEl = document.getElementById('report-expense');
         const reportNetEl = document.getElementById('report-net');
+
+        // New filter elements
+        const clearFiltersBtn = document.getElementById('clear-filters-btn');
+        const typeFilter = document.getElementById('type-filter');
+        const categoryFilter = document.getElementById('category-filter');
+        const sortFilter = document.getElementById('sort-filter');
+        const advancedFilterToggle = document.getElementById('advanced-filter-toggle');
+        const advancedFilters = document.getElementById('advanced-filters');
+        const minAmountInput = document.getElementById('min-amount');
+        const maxAmountInput = document.getElementById('max-amount');
+        const filterResults = document.getElementById('filter-results');
+        const resultsCount = document.getElementById('results-count');
         const budgetListEl = document.getElementById('budget-list');
         const budgetEmptyStateEl = document.getElementById('budget-empty-state');
         const budgetMonthEl = document.getElementById('budget-month');
@@ -1551,8 +1707,33 @@
 
         function populateCategoryDropdown() {
             const currentCategory = categoryInput.value;
+            const currentFilterCategory = categoryFilter.value;
+
+            // Populate transaction form dropdown
             categoryInput.innerHTML = allCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
             if (allCategories.includes(currentCategory)) categoryInput.value = currentCategory;
+
+            // Populate filter dropdown
+            categoryFilter.innerHTML = '<option value="all">Tất cả danh mục</option>' +
+                allCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            if (allCategories.includes(currentFilterCategory)) categoryFilter.value = currentFilterCategory;
+        }
+
+        function clearAllFilters() {
+            searchInput.value = '';
+            typeFilter.value = 'all';
+            categoryFilter.value = 'all';
+            sortFilter.value = 'date_desc';
+            dateRangeFilter.value = 'all';
+            startDateInput.value = '';
+            endDateInput.value = '';
+            minAmountInput.value = '';
+            maxAmountInput.value = '';
+            customDateFilters.classList.add('hidden');
+            advancedFilters.classList.add('hidden');
+            advancedFilterToggle.innerHTML = '<i class="fas fa-filter mr-1"></i>Nâng cao';
+            processAndRenderData();
+            Toast.info('Đã xóa tất cả bộ lọc');
         }
 
         function showEditCategoryModal(oldName) {
@@ -1606,15 +1787,91 @@
 
         // --- DATA PROCESSING & RENDERING ---
         function getFilteredTransactions() {
-            allTransactions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-            const searchTerm = searchInput.value.toLowerCase();
+            let filtered = [...allTransactions];
+
+            // Apply filters
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const typeFilterValue = typeFilter.value;
+            const categoryFilterValue = categoryFilter.value;
             const { startDate, endDate } = getDateRangeFromFilter();
-            return allTransactions.filter(t => {
-                const tDate = t.createdAt;
-                const matchesSearch = t.description.toLowerCase().includes(searchTerm);
-                const matchesDate = (!startDate || tDate >= startDate) && (!endDate || tDate <= endDate);
-                return matchesSearch && matchesDate;
+            const { minAmount, maxAmount } = getAmountRange();
+
+            // Filter by search term (description, amount, category)
+            if (searchTerm) {
+                filtered = filtered.filter(t => {
+                    const matchesDescription = t.description.toLowerCase().includes(searchTerm);
+                    const matchesCategory = t.category.toLowerCase().includes(searchTerm);
+                    const matchesAmount = formatCurrency(t.amount).toLowerCase().includes(searchTerm) ||
+                        t.amount.toString().includes(searchTerm);
+                    return matchesDescription || matchesCategory || matchesAmount;
+                });
+            }
+
+            // Filter by transaction type
+            if (typeFilterValue !== 'all') {
+                filtered = filtered.filter(t => t.type === typeFilterValue);
+            }
+
+            // Filter by category
+            if (categoryFilterValue !== 'all') {
+                filtered = filtered.filter(t => t.category === categoryFilterValue);
+            }
+
+            // Filter by date range
+            if (startDate || endDate) {
+                filtered = filtered.filter(t => {
+                    const tDate = t.createdAt;
+                    return (!startDate || tDate >= startDate) && (!endDate || tDate <= endDate);
+                });
+            }
+
+            // Filter by amount range
+            if (minAmount !== null || maxAmount !== null) {
+                filtered = filtered.filter(t => {
+                    return (minAmount === null || t.amount >= minAmount) &&
+                        (maxAmount === null || t.amount <= maxAmount);
+                });
+            }
+
+            // Apply sorting
+            const sortValue = sortFilter.value;
+            filtered.sort((a, b) => {
+                switch (sortValue) {
+                    case 'date_asc':
+                        return a.createdAt.getTime() - b.createdAt.getTime();
+                    case 'date_desc':
+                        return b.createdAt.getTime() - a.createdAt.getTime();
+                    case 'amount_asc':
+                        return a.amount - b.amount;
+                    case 'amount_desc':
+                        return b.amount - a.amount;
+                    case 'name_asc':
+                        return a.description.localeCompare(b.description, 'vi');
+                    case 'name_desc':
+                        return b.description.localeCompare(a.description, 'vi');
+                    default:
+                        return b.createdAt.getTime() - a.createdAt.getTime();
+                }
             });
+
+            return filtered;
+        }
+
+        function getAmountRange() {
+            const minAmountValue = minAmountInput.value.trim();
+            const maxAmountValue = maxAmountInput.value.trim();
+
+            const parseAmount = (value) => {
+                if (!value) return null;
+                const cleanValue = value.replace(/[\s,\.]/g, '');
+                const num = parseFloat(cleanValue);
+                return isNaN(num) ? null : num;
+            };
+
+            return {
+                minAmount: parseAmount(minAmountValue),
+                maxAmount: parseAmount(maxAmountValue)
+            };
         }
 
         function processAndRenderData() {
@@ -1624,6 +1881,25 @@
             updateHomeDashboard(allTransactions);
             updateChart(allTransactions);
             updateReportSummary(filteredTransactions);
+            updateFilterResults(filteredTransactions.length);
+        }
+
+        function updateFilterResults(count) {
+            resultsCount.textContent = count.toLocaleString('vi-VN');
+            if (count > 0 || hasActiveFilters()) {
+                filterResults.classList.remove('hidden');
+            } else {
+                filterResults.classList.add('hidden');
+            }
+        }
+
+        function hasActiveFilters() {
+            return searchInput.value.trim() !== '' ||
+                typeFilter.value !== 'all' ||
+                categoryFilter.value !== 'all' ||
+                dateRangeFilter.value !== 'all' ||
+                minAmountInput.value.trim() !== '' ||
+                maxAmountInput.value.trim() !== '';
         }
 
         function renderTransactionList(transactions, containerEl, emptyEl, emptyText = "Chưa có giao dịch nào.") {
@@ -2141,10 +2417,44 @@
                 }
             });
 
-            [searchInput, startDateInput, endDateInput].forEach(el => {
+            // Filter event listeners
+            [searchInput, startDateInput, endDateInput, minAmountInput, maxAmountInput].forEach(el => {
                 el.addEventListener('input', () => {
-                    if (document.activeElement === startDateInput || document.activeElement === endDateInput) { dateRangeFilter.value = 'custom'; customDateFilters.classList.remove('hidden'); }
+                    if (document.activeElement === startDateInput || document.activeElement === endDateInput) {
+                        dateRangeFilter.value = 'custom';
+                        customDateFilters.classList.remove('hidden');
+                    }
                     processAndRenderData();
+                });
+            });
+
+            [typeFilter, categoryFilter, sortFilter].forEach(el => {
+                el.addEventListener('change', processAndRenderData);
+            });
+
+            // Clear filters button
+            clearFiltersBtn.addEventListener('click', clearAllFilters);
+
+            // Advanced filter toggle
+            advancedFilterToggle.addEventListener('click', () => {
+                const isHidden = advancedFilters.classList.contains('hidden');
+                if (isHidden) {
+                    advancedFilters.classList.remove('hidden');
+                    advancedFilterToggle.innerHTML = '<i class="fas fa-filter mr-1"></i>Thu gọn';
+                } else {
+                    advancedFilters.classList.add('hidden');
+                    advancedFilterToggle.innerHTML = '<i class="fas fa-filter mr-1"></i>Nâng cao';
+                }
+            });
+
+            // Format amount inputs
+            [minAmountInput, maxAmountInput].forEach(input => {
+                input.addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/[^\d]/g, '');
+                    if (value) {
+                        value = parseInt(value).toLocaleString('vi-VN');
+                        e.target.value = value;
+                    }
                 });
             });
         }
@@ -2156,12 +2466,50 @@
             let startDate = null, endDate = null;
             const startOfDay = (date) => new Date(date.setHours(0, 0, 0, 0));
             const endOfDay = (date) => new Date(date.setHours(23, 59, 59, 999));
+
             switch (range) {
-                case 'today': startDate = startOfDay(new Date()); endDate = endOfDay(new Date()); break;
-                case 'this_week': const firstDayOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); startDate = startOfDay(firstDayOfWeek); endDate = endOfDay(new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000)); break;
-                case 'this_month': startDate = new Date(now.getFullYear(), now.getMonth(), 1); endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999); break;
-                case 'this_year': startDate = new Date(now.getFullYear(), 0, 1); endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999); break;
-                case 'custom': startDate = startDateInput.value ? startOfDay(new Date(startDateInput.value)) : null; endDate = endDateInput.value ? endOfDay(new Date(endDateInput.value)) : null; break;
+                case 'today':
+                    startDate = startOfDay(new Date());
+                    endDate = endOfDay(new Date());
+                    break;
+                case 'yesterday':
+                    const yesterday = new Date(now);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    startDate = startOfDay(yesterday);
+                    endDate = endOfDay(new Date(yesterday));
+                    break;
+                case 'this_week':
+                    const firstDayOfWeek = new Date(now);
+                    firstDayOfWeek.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
+                    startDate = startOfDay(firstDayOfWeek);
+                    endDate = endOfDay(new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000));
+                    break;
+                case 'last_week':
+                    const lastWeekStart = new Date(now);
+                    lastWeekStart.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -13 : -6));
+                    startDate = startOfDay(lastWeekStart);
+                    endDate = endOfDay(new Date(lastWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000));
+                    break;
+                case 'this_month':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+                    break;
+                case 'last_month':
+                    startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+                    break;
+                case 'this_year':
+                    startDate = new Date(now.getFullYear(), 0, 1);
+                    endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+                    break;
+                case 'last_year':
+                    startDate = new Date(now.getFullYear() - 1, 0, 1);
+                    endDate = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59, 999);
+                    break;
+                case 'custom':
+                    startDate = startDateInput.value ? startOfDay(new Date(startDateInput.value)) : null;
+                    endDate = endDateInput.value ? endOfDay(new Date(endDateInput.value)) : null;
+                    break;
             }
             return { startDate, endDate };
         }
