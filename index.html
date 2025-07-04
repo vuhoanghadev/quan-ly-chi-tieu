@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Quản Lý Chi Tiêu Cá Nhân</title>
 
     <!-- Favicon cho tất cả trình duyệt và thiết bị -->
@@ -36,8 +36,8 @@
     <meta name="application-name" content="Quản Lý Chi Tiêu">
     <meta name="apple-mobile-web-app-title" content="Chi Tiêu">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 
     <!-- SEO Meta Tags -->
     <meta name="description" content="Ứng dụng quản lý chi tiêu cá nhân đơn giản và hiệu quả">
@@ -56,11 +56,6 @@
     <style>
         body {
             font-family: 'Be Vietnam Pro', sans-serif;
-            /* Safe area support cho iPhone tai thỏ */
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
         }
 
         /* Custom Scrollbar */
@@ -437,67 +432,6 @@
             transform: translateZ(0);
         }
 
-        /* Safe Area Support cho iPhone tai thỏ */
-        .safe-area-header {
-            padding-top: calc(env(safe-area-inset-top) + 1rem);
-            padding-left: calc(env(safe-area-inset-left) + 1rem);
-            padding-right: calc(env(safe-area-inset-right) + 1rem);
-        }
-
-        /* Đảm bảo main content không bị che bởi header */
-        .safe-area-content {
-            /* Thêm padding để tránh bị che bởi header */
-            position: relative;
-            z-index: 1;
-        }
-
-        /* PWA specific styles */
-        @media (display-mode: standalone) {
-            body {
-                /* Tăng padding cho PWA mode */
-                padding-top: env(safe-area-inset-top);
-                /* Ngăn content scroll qua header */
-                overflow-x: hidden;
-            }
-
-            .safe-area-header {
-                /* Header trong PWA mode - cố định và không trong suốt */
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                background: rgb(31, 41, 55);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                z-index: 100;
-                /* Thêm safe area cho header */
-                padding-top: env(safe-area-inset-top);
-                padding-left: calc(env(safe-area-inset-left) + 1rem);
-                padding-right: calc(env(safe-area-inset-right) + 1rem);
-                padding-bottom: 1rem;
-            }
-
-            .safe-area-content {
-                /* Đảm bảo content không bị che bởi fixed header */
-                margin-top: calc(env(safe-area-inset-top) + 4rem);
-                padding-top: 0;
-            }
-        }
-
-        /* iOS Safari specific fixes */
-        @supports (-webkit-touch-callout: none) {
-            body {
-                /* iOS Safari */
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .safe-area-header {
-                position: -webkit-sticky;
-                position: sticky;
-                top: env(safe-area-inset-top, 0);
-            }
-        }
-
         /* High contrast mode support */
         @media (prefers-contrast: high) {
             .toast {
@@ -544,6 +478,174 @@
         #mainContent.mb-20 {
             margin-bottom: 12rem;
         }
+
+        /* iOS PWA Safe Area Support */
+        /* Đảm bảo app container sử dụng toàn bộ viewport */
+        #app {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+
+        /* Header với safe area support cho iOS PWA */
+        header {
+            padding-top: env(safe-area-inset-top, 1rem);
+            padding-left: env(safe-area-inset-left, 1rem);
+            padding-right: env(safe-area-inset-right, 1rem);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        /* Main content với safe area */
+        #mainContent {
+            padding-left: max(1rem, env(safe-area-inset-left));
+            padding-right: max(1rem, env(safe-area-inset-right));
+            padding-bottom: max(5rem, env(safe-area-inset-bottom));
+        }
+
+        /* Bottom navigation với safe area */
+        #tab-nav {
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            padding-left: env(safe-area-inset-left, 0);
+            padding-right: env(safe-area-inset-right, 0);
+        }
+
+        /* FAB button với safe area */
+        #add-fab {
+            bottom: calc(6rem + env(safe-area-inset-bottom, 0));
+            right: calc(1.25rem + env(safe-area-inset-right, 0));
+        }
+
+        /* Modal với safe area support */
+        #add-edit-modal {
+            padding-top: env(safe-area-inset-top, 0);
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            padding-left: env(safe-area-inset-left, 0);
+            padding-right: env(safe-area-inset-right, 0);
+        }
+
+        /* Toast container với safe area */
+        .toast-container {
+            top: calc(1.25rem + env(safe-area-inset-top, 0));
+            right: calc(1.25rem + env(safe-area-inset-right, 0));
+            left: calc(1.25rem + env(safe-area-inset-left, 0));
+        }
+
+        /* Đặc biệt cho iOS standalone mode */
+        @media (display-mode: standalone) {
+
+            /* Đảm bảo body không bị scroll qua header */
+            body {
+                overflow-x: hidden;
+                position: relative;
+            }
+
+            /* Header cố định với backdrop */
+            header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                background: rgba(31, 41, 55, 0.9);
+            }
+
+            /* Main content offset để tránh bị che bởi header */
+            #mainContent {
+                margin-top: calc(4rem + env(safe-area-inset-top, 0));
+                padding-top: 1rem;
+            }
+
+            /* Loading screen cũng cần offset */
+            #loading {
+                margin-top: calc(4rem + env(safe-area-inset-top, 0));
+            }
+        }
+
+        /* Responsive cho desktop */
+        @media (min-width: 1024px) {
+            header {
+                padding-top: 1rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            #mainContent {
+                margin-top: 0;
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            #add-fab {
+                bottom: 2rem;
+                right: 2rem;
+            }
+        }
+
+        /* Đặc biệt cho iOS Safari và PWA */
+        @supports (-webkit-touch-callout: none) {
+
+            /* Đảm bảo không có scroll bounce */
+            body {
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: none;
+            }
+
+            /* Đảm bảo header luôn ở trên cùng */
+            header {
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
+            }
+        }
+
+        /* PWA Mode Styles */
+        .pwa-mode {
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
+            overflow-x: hidden;
+        }
+
+        .pwa-mode header {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 1000 !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(31, 41, 55, 0.95) !important;
+        }
+
+        .pwa-mode #mainContent {
+            margin-top: calc(4rem + env(safe-area-inset-top, 0)) !important;
+            padding-top: 1rem !important;
+        }
+
+        .pwa-mode #loading {
+            margin-top: calc(4rem + env(safe-area-inset-top, 0)) !important;
+        }
+
+        /* Xử lý cho các thiết bị có notch */
+        @media screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
+        screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
+        screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3),
+        screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3),
+        screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) {
+
+            .pwa-mode header {
+                padding-top: max(env(safe-area-inset-top), 2.5rem) !important;
+            }
+
+            .pwa-mode #mainContent {
+                margin-top: calc(4rem + max(env(safe-area-inset-top), 2.5rem)) !important;
+            }
+
+            .pwa-mode #loading {
+                margin-top: calc(4rem + max(env(safe-area-inset-top), 2.5rem)) !important;
+            }
+        }
     </style>
 </head>
 
@@ -552,7 +654,7 @@
     <div id="app" class="w-full min-h-screen bg-gray-900 flex flex-col relative">
 
         <header
-            class="bg-gray-800/95 backdrop-blur-md text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-50 border-b border-gray-700 lg:hidden safe-area-header">
+            class="bg-gray-800/80 backdrop-blur-sm text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-20 border-b border-gray-700 lg:hidden">
             <h1 id="header-title" class="text-xl font-bold">Trang chủ</h1>
         </header>
 
@@ -561,8 +663,7 @@
                 <i class="fas fa-spinner fa-spin fa-3x text-indigo-500"></i>
             </div>
 
-            <main id="mainContent"
-                class="p-4 md:p-6 flex-grow hidden mb-20 lg:mb-6 lg:max-w-4xl lg:mx-auto safe-area-content">
+            <main id="mainContent" class="p-4 md:p-6 flex-grow hidden mb-20 lg:mb-6 lg:max-w-4xl lg:mx-auto">
                 <div id="home-view" class="view">
                     <section class="mb-6 p-6 bg-gray-800 rounded-2xl shadow-lg">
                         <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider">Số dư hiện tại</h2>
@@ -2321,7 +2422,73 @@
             document.body.removeChild(textArea);
         }
 
-        document.addEventListener('DOMContentLoaded', initializeApp);
+        // --- PWA SAFE AREA HANDLER ---
+        function handlePWASafeArea() {
+            // Phát hiện PWA mode
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true;
+
+            if (isPWA) {
+                document.body.classList.add('pwa-mode');
+
+                // Xử lý safe area cho iOS
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                if (isIOS) {
+                    // Đảm bảo viewport height được tính đúng
+                    const setViewportHeight = () => {
+                        const vh = window.innerHeight * 0.01;
+                        document.documentElement.style.setProperty('--vh', `${vh}px`);
+                    };
+
+                    setViewportHeight();
+                    window.addEventListener('resize', setViewportHeight);
+                    window.addEventListener('orientationchange', () => {
+                        setTimeout(setViewportHeight, 100);
+                    });
+
+                    // Ngăn chặn scroll bounce
+                    document.addEventListener('touchmove', (e) => {
+                        if (e.target.closest('#mainContent') || e.target.closest('#add-edit-modal')) {
+                            return;
+                        }
+                        e.preventDefault();
+                    }, { passive: false });
+                }
+            }
+        }
+
+        // --- SCROLL PREVENTION FOR HEADER ---
+        function preventHeaderOverscroll() {
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+                // Ngăn scroll âm (overscroll)
+                if (scrollTop < 0) {
+                    window.scrollTo(0, 0);
+                    return;
+                }
+
+                lastScrollTop = scrollTop;
+            }, { passive: false });
+
+            // Đảm bảo header luôn ở vị trí đúng
+            if (header) {
+                header.style.position = 'fixed';
+                header.style.top = '0';
+                header.style.left = '0';
+                header.style.right = '0';
+                header.style.zIndex = '1000';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            handlePWASafeArea();
+            preventHeaderOverscroll();
+            initializeApp();
+        });
     </script>
 </body>
 
