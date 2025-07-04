@@ -370,8 +370,6 @@
 
         /* Numeric Input Optimization for Mobile */
         input[inputmode="numeric"] {
-            text-align: right;
-            /* Align numbers to the right for better UX */
             font-variant-numeric: tabular-nums;
             /* Use monospace numbers */
         }
@@ -2366,7 +2364,7 @@
             form.reset();
             editingIdInput.value = id;
             descriptionInput.value = transaction.description;
-            amountInput.value = transaction.amount;
+            amountInput.value = transaction.amount.toLocaleString('vi-VN');
             categoryInput.value = transaction.category;
             formTitle.textContent = 'Sửa giao dịch';
             addModeToggle.classList.add('hidden');
@@ -2714,13 +2712,24 @@
                 }
             });
 
-            // Format amount inputs
+            // Format amount inputs với xử lý con trỏ
             [minAmountInput, maxAmountInput].forEach(input => {
                 input.addEventListener('input', (e) => {
+                    // Lưu vị trí con trỏ
+                    const cursorPosition = e.target.selectionStart;
+                    const oldValue = e.target.value;
+
+                    // Chỉ giữ lại số
                     let value = e.target.value.replace(/[^\d]/g, '');
+
+                    // Format với dấu chấm phân cách hàng nghìn
                     if (value) {
-                        value = parseInt(value).toLocaleString('vi-VN');
-                        e.target.value = value;
+                        const formattedValue = parseInt(value).toLocaleString('vi-VN');
+                        e.target.value = formattedValue;
+
+                        // Tính toán vị trí con trỏ mới
+                        const newCursorPosition = cursorPosition + (formattedValue.length - oldValue.length);
+                        e.target.setSelectionRange(newCursorPosition, newCursorPosition);
                     }
                 });
             });
@@ -2805,8 +2814,26 @@
                 }
             });
 
-            // Amount validation - đơn giản, chỉ validate
+            // Amount validation và format tự động
             amountInput.addEventListener('input', (e) => {
+                // Lưu vị trí con trỏ
+                const cursorPosition = e.target.selectionStart;
+                const oldValue = e.target.value;
+
+                // Chỉ giữ lại số
+                let value = e.target.value.replace(/[^\d]/g, '');
+
+                // Format với dấu chấm phân cách hàng nghìn
+                if (value) {
+                    const formattedValue = parseInt(value).toLocaleString('vi-VN');
+                    e.target.value = formattedValue;
+
+                    // Tính toán vị trí con trỏ mới
+                    const newCursorPosition = cursorPosition + (formattedValue.length - oldValue.length);
+                    e.target.setSelectionRange(newCursorPosition, newCursorPosition);
+                }
+
+                // Validation
                 const error = Validator.validateAmount(e.target.value);
                 if (error) {
                     Validator.showError('amount', error);
